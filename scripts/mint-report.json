@@ -1,0 +1,50 @@
+[
+  {
+    "Mint": "403089428078",
+    "User": "0x6DCeB0F7Dd6bED4fF190D8cA74F67973C280f4B4",
+    "Recipient": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Amount": "180000000000000000000",
+    "ReportTo": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Token": "stETH"
+  },
+  {
+    "Mint": "246332428270",
+    "User": "0xdA4Ef9B6d55176ab0760b8fe90152c699C91D16e",
+    "Recipient": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Amount": "110000000000000000000",
+    "ReportTo": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Token": "stETH"
+  },
+  {
+    "Mint": "139490691",
+    "User": "0x360d26B78eECB0DC96c3fC4d99512879916b35c4",
+    "Recipient": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Amount": "100000000000000000000",
+    "ReportTo": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Token": "DAI"
+  },
+  {
+    "Mint": "251083244",
+    "User": "0x0d386297c95C7e48db734E3Eb2F476CD73f92E59",
+    "Recipient": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Amount": "180000000000000000000",
+    "ReportTo": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Token": "DAI"
+  },
+  {
+    "Mint": "240627859",
+    "User": "0x7300782D46E385B1D0B4e831D48c4224F502ECb9",
+    "Recipient": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Amount": "172504600000000000018",
+    "ReportTo": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Token": "DAI"
+  },
+  {
+    "Mint": "8369441483",
+    "User": "0x43C68e2C3Fc96b077d19e503a609a83Cb4D0c6fA",
+    "Recipient": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Amount": "5999999999999999849998",
+    "ReportTo": "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+    "Token": "DAI"
+  }
+]
