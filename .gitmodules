@@ -1,0 +1,6 @@
+[submodule "spec/vendor/aos"]
+	path = spec/vendor/aos
+	url = https://github.com/permaweb/aos.git
+[submodule "vendor/aos"]
+	path = vendor/aos
+	url = https://github.com/permaweb/aos.git
