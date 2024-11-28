@@ -9,6 +9,7 @@
   "description": "# 1. Token Distribution Analysis and Implementation",
   "main": "index.js",
   "scripts": {
+    "init": "git submodule update --init --recursive && cd vendor/aos && npm install && cd ../..",
     "test": "node --experimental-wasm-memory64 spec/test.js"
   },
   "keywords": [],
