@@ -8,19 +8,43 @@ const __dirname = path.dirname(__filename);
 const relative = (p) => path.resolve(__dirname, p);
 const importLua = (p) => ".load " + relative(relative(p));
 
-const [line, modules] = load(importLua("entry.lua"));
-
-const env = {
-  Process: {
-    Id: "2",
-    Tags: [
-      {
-        name: "Authority",
-        value: "fcoN_xJeisVsPXA-trzVAuIiqO3ydLQxM-L4XbrQKzY",
-      },
-    ],
-  },
+const wasmBinary = fs.readFileSync(relative("libs/sqlite.wasm"));
+const processOptions = {
+  format: "wasm64-unknown-emscripten-draft_2024_02_15",
+  inputEncoding: "JSON-1",
+  outputEncoding: "JSON-1",
+  memoryLimit: "1073741824", // 1-gb
+  computeLimit: (9e12).toString(),
+  extensions: [],
 };
+
+function scanSpec() {
+  const files = fs.readdirSync(__dirname);
+  const luaFiles = files.filter((f) => f.endsWith("_spec.lua"));
+  return luaFiles;
+}
+
+async function runTestfile(path) {
+  const [line] = load(importLua(path));
+  const handle = await AoLoader(wasmBinary, processOptions);
+  const spawnResult = await handle(null, getMsg(line), getEnv());
+  console.log(spawnResult.Output.data);
+}
+
+async function main() {
+  const testFile = process.argv[2];
+  if (!testFile) {
+    const allSpecFileList = scanSpec();
+    for (const file of allSpecFileList) {
+      console.group(`Running ${file}`);
+      await runTestfile(file);
+      console.groupEnd();
+    }
+  } else {
+    runTestfile(testFile);
+  }
+}
+main();
 
 function getMsg(Data, Action = "Eval") {
   return {
@@ -51,17 +75,3 @@ function getEnv() {
     },
   };
 }
-
-const wasmBinary = fs.readFileSync(relative("sqlite.wasm"));
-const handle = await AoLoader(wasmBinary, {
-  format: "wasm64-unknown-emscripten-draft_2024_02_15",
-  inputEncoding: "JSON-1",
-  outputEncoding: "JSON-1",
-  memoryLimit: "1073741824", // 1-gb
-  computeLimit: (9e12).toString(),
-  extensions: [],
-});
-
-const spawnResult = await handle(null, getMsg(line), getEnv());
-
-console.log(spawnResult.Output.data);

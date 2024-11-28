@@ -1,7 +1,8 @@
-local luaunit = require('luaunit')
+local luaunit = require('libs.luaunit')
 luaunit.LuaUnit:setOutputType("tap")
 luaunit:setVerbosity(luaunit.VERBOSITY_VERBOSE)
 
+-- Test Module from process
 local m = require('process.math')
 
 TestMath = {}
@@ -12,7 +13,6 @@ end
 
 function TestMath:testMul()
     luaunit.assertEquals(m.multiply(1,2), 2)
-    luaunit.assertEquals(m.multiply(1,2), 1)
 end
 
 luaunit.LuaUnit.run()
