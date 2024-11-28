@@ -39,6 +39,8 @@ luac.out
 *.x86_64
 *.hex
 
-.vscode/**
-
+vendor
+node_modules
+.vscode
 .DS_Store
+.build

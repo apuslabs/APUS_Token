@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "@permaweb/ao-loader": "^0.0.43",
+    "dayjs": "^1.11.13",
+    "fs-extra": "^11.2.0"
+  },
+  "name": "apus_token",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "# 1. Token Distribution Analysis and Implementation",
+  "main": "index.js",
+  "scripts": {
+    "init": "git submodule update --init --recursive && cd vendor/aos && npm install && cd ../..",
+    "test": "node --experimental-wasm-memory64 spec/test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,3 @@
+[submodule "vendor/aos"]
+	path = vendor/aos
+	url = https://github.com/permaweb/aos.git

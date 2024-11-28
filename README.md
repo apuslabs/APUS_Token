@@ -5,6 +5,7 @@
 ## 1.1 Overview of Distribution Model
 
 ### Initial Allocation
+
 - **Community**: 92%
   - 80% (TGE 0%): Community delegating
   - 12% (TGE 0%): Pool Substake
@@ -19,10 +20,12 @@
 This document outlines the token release schedule for AO tokens over a 41-year period.
 
 ### First Year (TGE + Year 1)
+
 - **TGE (Time 0)**: 8% initial distribution
 - **Year 1**: 17% total distribution
 
 ### Subsequent Years
+
 - **Years 2-5**: 37.5% total
 - **Years 6-9**: 18.75% total
 - **Years 10-13**: 9.375% total
@@ -30,6 +33,7 @@ This document outlines the token release schedule for AO tokens over a 41-year p
 - **Following Years**: Continue halving the growth increment
 
 ### Data Structure
+
 ```lua
 local ReleaseSchedule = {
     -- First Year 17% (Monthly Release)
@@ -45,7 +49,7 @@ local ReleaseSchedule = {
     { epoch_start = 78336,   release_per_epoch = "1120" },  -- Oct, 1.0%
     { epoch_start = 87264,   release_per_epoch = "1120" },  -- Nov, 1.0%
     { epoch_start = 96192,   release_per_epoch = "1008" },  -- Dec, 0.9%
-    
+
     -- Subsequent Years
     { epoch_start = 105120,  release_per_epoch = "892" },   -- Years 2-5, 9.375%
     { epoch_start = 525600,  release_per_epoch = "446" },   -- Years 6-9, 4.6875%
@@ -59,11 +63,12 @@ local ReleaseSchedule = {
     { epoch_start = 3889440, release_per_epoch = "1" }      -- Years 38-41, 0.018310546875%
 }
 ```
+
 1. each epoch is 5 minutes
 1. `epoch_start`: The starting epoch number for each release period
-2. `release_per_epoch`: The amount of tokens to be released per epoch in that period
-3. Each period continues until the next `epoch_start`
-4. The final period (Years 38-41) ends at epoch 4,309,920
+1. `release_per_epoch`: The amount of tokens to be released per epoch in that period
+1. Each period continues until the next `epoch_start`
+1. The final period (Years 38-41) ends at epoch 4,309,920
 
 ### Implementation Considerations
 
@@ -72,3 +77,20 @@ local ReleaseSchedule = {
 3. Each period's release rate remains constant until the next period begins
 4. Implement proper overflow checks for epoch calculations
 5. All release amounts should be validated against the total supply cap
+
+# How to test
+
+All testcase should be under spec folder
+
+`npm run test -- entry.lua` or
+`npm run test`
+
+Every testfile should be end with `_spec.lua`
+Every testfile should contains
+
+```lua
+local luaunit = require('libs.luaunit')
+luaunit.LuaUnit:setOutputType("tap")
+luaunit:setVerbosity(luaunit.VERBOSITY_VERBOSE)
+luaunit.LuaUnit.run()
+```
