@@ -1,5 +1,5 @@
 import AoLoader from "@permaweb/ao-loader";
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
 import { load } from "../vendor/aos/src/commands/load.js";
@@ -28,20 +28,39 @@ async function runTestfile(path) {
   const [line] = load(importLua(path));
   const handle = await AoLoader(wasmBinary, processOptions);
   const spawnResult = await handle(null, getMsg(line), getEnv());
-  console.log(spawnResult.Output.data);
+  if (spawnResult.Error) {
+    console.error(spawnResult.Error);
+  } else {
+    console.log(spawnResult?.Output?.data);
+  }
+}
+
+function prepareBuildFolder() {
+  const buildPath = relative(".build");
+  fs.ensureDirSync(buildPath);
+  fs.emptyDirSync(buildPath);
+  const apusTokenPath = relative("../apus_token");
+  fs.copySync(apusTokenPath, buildPath);
+  const specPath = relative("");
+  fs.readdirSync(specPath).forEach((file) => {
+    if (file !== ".build") {
+      fs.copySync(path.join(specPath, file), path.join(buildPath, file));
+    }
+  });
 }
 
 async function main() {
+  prepareBuildFolder();
   const testFile = process.argv[2];
   if (!testFile) {
     const allSpecFileList = scanSpec();
     for (const file of allSpecFileList) {
       console.group(`Running ${file}`);
-      await runTestfile(file);
+      await runTestfile(".build/" + file);
       console.groupEnd();
     }
   } else {
-    runTestfile(testFile);
+    runTestfile(".build/" + testFile);
   }
 }
 main();

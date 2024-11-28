@@ -3,7 +3,7 @@ local json = require('json')
 local Utils = require('.utils')
 
 MintDb = MintDb or sqlite3.open_memory()
-DbAdmin = DbAdmin or require('@rakis/DbAdmin').new(MintDb)
+DbAdmin = DbAdmin or require('utils.db_admin').new(MintDb)
 
 Deposits = require('dal.deposits').new(DbAdmin)
 
@@ -46,3 +46,5 @@ Handlers.add("token.balances", Handlers.utils.hasMatchingTag("Action", "Balances
 Handlers.add("token.totalSupply", Handlers.utils.hasMatchingTag("Action", "Total-Supply"), Token.totalSupply)
 Handlers.add("token.burn", Handlers.utils.hasMatchingTag("Action", "Burn"), Token.burn)
 Handlers.add("token.mintedSupply", Handlers.utils.hasMatchingTag("Action", "Minted-Supply"), Token.mintedSupply)
+
+return {}

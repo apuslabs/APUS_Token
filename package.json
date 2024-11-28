@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@permaweb/ao-loader": "^0.0.43",
-    "dayjs": "^1.11.13"
+    "dayjs": "^1.11.13",
+    "fs-extra": "^11.2.0"
   },
   "name": "apus_token",
   "type": "module",
