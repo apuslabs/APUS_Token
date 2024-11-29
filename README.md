@@ -80,6 +80,8 @@ local ReleaseSchedule = {
 
 # How to test
 
+first run `npm run init`
+
 All testcase should be under spec folder
 
 `npm run test -- entry.lua` or

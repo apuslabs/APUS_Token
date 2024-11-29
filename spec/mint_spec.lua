@@ -2,7 +2,7 @@ local luaunit = require('libs.luaunit')
 luaunit.LuaUnit:setOutputType("tap")
 luaunit:setVerbosity(luaunit.VERBOSITY_VERBOSE)
 
-local Utils = require('utils')
+local Utils = require('libs.utils')
 
 TestToken = {}
 
