@@ -2,10 +2,9 @@ local luaunit = require('libs.luaunit')
 luaunit.LuaUnit:setOutputType("tap")
 luaunit:setVerbosity(luaunit.VERBOSITY_VERBOSE)
 
-local Utils = require('utils')
 local BintUtils = require('utils.bint_utils')
 local bint = require('.bint')(256)
-TestMint = {}
+TestMintNormal = {}
 
 Mint = nil
 
@@ -13,7 +12,7 @@ Allocator = require('allocator')
 
 Balances = { ["ADDRESS_1"] = "80000000000000000000" }
 
-function TestMint:setup()
+function TestMintNormal:setup()
     local sqlite3 = require('lsqlite3')
     MintDb = sqlite3.open_memory()
     DbAdmin = require('utils.db_admin').new(MintDb)
@@ -25,7 +24,7 @@ end
 -- [[
 --   Track Variables
 -- ]]
-function TestMint:testBasic()
+function TestMintNormal:testBasic()
     luaunit.assertNotNil(MintDb)
     luaunit.assertNotNil(DbAdmin)
     luaunit.assertNotNil(Deposits)
@@ -46,7 +45,7 @@ end
 --     Test process mint reports,  these reports are filtered by the router, so all the
 --   reports should belong to this process.
 -- ]]
-function TestMint:testInsert()
+function TestMintNormal:testInsert()
     local mintReportList = {}
     table.insert(mintReportList, {
         Mint = "403089428078",
@@ -122,7 +121,7 @@ end
 --     Test process mint reports,  these reports are filtered by the router, so all the
 --   reports should belong to this process.
 -- ]]
-function TestMint:testAllocateWithoutBinding()
+function TestMintNormal:testAllocateWithoutBinding()
     local mintReportList = {}
 
     table.insert(mintReportList, {
@@ -211,7 +210,7 @@ end
 --     Test process mint reports,  these reports are filtered by the router, so all the
 --   reports should belong to this process.
 -- ]]
-function TestMint:testAllocateWithUsersBinded()
+function TestMintNormal:testAllocateWithUsersBinded()
     local mintReportList = {}
 
     table.insert(mintReportList, {
