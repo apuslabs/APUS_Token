@@ -9,8 +9,9 @@ ApusStatisticsProcess = ApusStatisticsProcess or ""
 
 -- 5 MIN REWARD SUPPLY PERCENT
 -- APUS_Mint_PCT = 21, 243, 598 / 10,000,000,000,000 = 0.0019422
-APUS_MINT_PCT_1 = bint(22369950081) / bint(10000000000000000)
-APUS_MINT_PCT_2 = bint(16473357700) / bint(10000000000000000)
+APUS_MINT_PCT_1 = 19421654225
+APUS_MINT_PCT_2 = 16473367976
+APUS_MINT_UNIT = 10000000000000000
 
 -- Use the average value, not the real year days and month days
 INTERVALS_PER_YEAR = 365.25 * 24 * 12                            -- 105192
@@ -33,9 +34,8 @@ Mint.currentMintAmount = function()
     if MintTimes > INTERVALS_PER_YEAR then
         pct = APUS_MINT_PCT_2
     end
-    MintTimes = MintTimes + 1
     local remainingSupply = BintUtils.subtract(MINT_CAPACITY, MintedSupply)
-    local releaseAmount = string.format('%.0f', bint(remainingSupply) * pct)
+    local releaseAmount = BintUtils.toBalanceValue(bint(remainingSupply) * bint(pct) // bint(APUS_MINT_UNIT))
     return releaseAmount
 end
 
@@ -55,6 +55,8 @@ Mint.mint = function()
     end, "0", Utils.values(Balances))
     local cost = BintUtils.subtract(MintedSupply, beforeMintedSupply);
     Deposits:clearMint()
+
+    MintTimes = MintTimes + 1
 
     collectgarbage('collect')
 end

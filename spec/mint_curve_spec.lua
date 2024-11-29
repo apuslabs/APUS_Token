@@ -2,7 +2,6 @@ local luaunit = require('libs.luaunit')
 luaunit.LuaUnit:setOutputType("tap")
 luaunit:setVerbosity(luaunit.VERBOSITY_VERBOSE)
 
-local Utils = require('utils')
 local BintUtils = require('utils.bint_utils')
 local bint = require('.bint')(256)
 TestMintCurve = {}
@@ -38,18 +37,61 @@ function TestMintCurve:testCurve()
     local releaseAmount = Mint.currentMintAmount()
     MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
     MintTimes = MintTimes + 1
+    if i % INTERVALS_PER_MONTH == 0 then
+      -- print(APUS_MINT_PCT_1)
+      print(MintedSupply)
+    end
   end
-  print(APUS_MINT_PCT_1)
-  print(MintedSupply)
-  luaunit.assertEquals(MintedSupply, "170000000003675286333")
+  luaunit.assertEquals(MintedSupply, "250000000002701730643")
 
   for i = 1, INTERVALS_PER_YEAR * 4 do
     local releaseAmount = Mint.currentMintAmount()
     MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
     MintTimes = MintTimes + 1
   end
-  print(APUS_MINT_PCT_2)
-  print(MintedSupply)
+  luaunit.assertEquals(MintedSupply, "625000000007424438463")
+
+  for i = 1, INTERVALS_PER_YEAR * 4 do
+    local releaseAmount = Mint.currentMintAmount()
+    MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
+    MintTimes = MintTimes + 1
+  end
+  luaunit.assertEquals(MintedSupply, "812500000006748929783")
+
+  for i = 1, INTERVALS_PER_YEAR * 4 do
+    local releaseAmount = Mint.currentMintAmount()
+    MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
+    MintTimes = MintTimes + 1
+  end
+  luaunit.assertEquals(MintedSupply, "906250000004892744378")
+
+  for i = 1, INTERVALS_PER_YEAR * 4 do
+    local releaseAmount = Mint.currentMintAmount()
+    MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
+    MintTimes = MintTimes + 1
+  end
+  luaunit.assertEquals(MintedSupply, "953125000003205436078")
+
+  for i = 1, INTERVALS_PER_YEAR * 4 do
+    local releaseAmount = Mint.currentMintAmount()
+    MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
+    MintTimes = MintTimes + 1
+  end
+  luaunit.assertEquals(MintedSupply, "976562500001982174216")
+
+  for i = 1, INTERVALS_PER_YEAR * 4 do
+    local releaseAmount = Mint.currentMintAmount()
+    MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
+    MintTimes = MintTimes + 1
+  end
+  luaunit.assertEquals(MintedSupply, "988281250001180739166")
+
+  for i = 1, INTERVALS_PER_YEAR * 4 do
+    local releaseAmount = Mint.currentMintAmount()
+    MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
+    MintTimes = MintTimes + 1
+  end
+  luaunit.assertEquals(MintedSupply, "994140625000685119568")
 end
 
 luaunit.LuaUnit.run()
