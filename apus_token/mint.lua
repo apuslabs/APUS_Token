@@ -74,6 +74,7 @@ Mint.mint = function(msg)
             end, "0", Utils.values(Balances))
         end
 
+        MintTimes = MintTimes + times
         Deposits:clearMint()
         if LastMintTime == 0 then
             LastMintTime = msg.Timestamp
