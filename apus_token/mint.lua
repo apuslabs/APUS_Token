@@ -22,6 +22,11 @@ INTERVALS_PER_MONTH = math.floor(DAYS_PER_MONTH * 24 * 12 + 0.5) -- 8766
 MintedSupply = MintedSupply or "80000000000000000000"
 MintTimes = MintTimes or 1
 
+MINT_COOL_DOWN = 300
+LastMintTime = LastMintTime or 0
+
+MODE = MODE or "OFF"
+
 Mint.batchUpdate = function(mintReportList)
     Utils.map(function(mintReport)
         Deposits:updateMintForUser(mintReport.User, mintReport.Mint)
@@ -39,27 +44,66 @@ Mint.currentMintAmount = function()
     return releaseAmount
 end
 
-Mint.mint = function()
-    local releaseAmount = Mint.currentMintAmount()
-    local deposits = Deposits:getToAllocateUsers()
+Mint.mint = function(msg)
+    local status, err = pcall(function()
+        if LastMintTime ~= 0 and msg.Timestamp - LastMintTime < MINT_COOL_DOWN then
+            print("Not cool down yet")
+            return "Not cool down yet"
+        end
+        if msg.Action == "Cron" and MODE == "OFF" then
+            print("Not Minting by CRON untils MODE is set to ON")
+            return "Not Minting by CRON untils MODE is set to ON"
+        end
+        local times = (msg.Timestamp - LastMintTime) // MINT_COOL_DOWN
+        if LastMintTime == 0 then
+            tiems = 1
+        end
+        local deposits = Deposits:getToAllocateUsers()
+        if not deposits or #deposits == 0 then
+            print("No users in the pool.")
+            return "No users in the pool."
+        end
+        for i = 1, times do
+            local releaseAmount = Mint.currentMintAmount()
+            local depositsWithReward = Allocator:compute(deposits, releaseAmount)
+            Utils.map(function(r)
+                Balances[r.Recipient] = BintUtils.add(Balances[r.Recipient] or "0", r.Reward)
+            end, depositsWithReward)
+            MintedSupply = Utils.reduce(function(acc, v)
+                return BintUtils.add(acc, v)
+            end, "0", Utils.values(Balances))
+        end
 
-    local depositsWithReward = Allocator:compute(deposits, releaseAmount)
-
-    Utils.map(function(r)
-        Balances[r.Recipient] = BintUtils.add(Balances[r.Recipient] or "0", r.Reward)
-    end, depositsWithReward)
-
-    local beforeMintedSupply = MintedSupply
-    MintedSupply = Utils.reduce(function(acc, v)
-        return BintUtils.add(acc, v)
-    end, "0", Utils.values(Balances))
-    local cost = BintUtils.subtract(MintedSupply, beforeMintedSupply);
-    Deposits:clearMint()
-
-    MintTimes = MintTimes + 1
-
-    collectgarbage('collect')
+        Deposits:clearMint()
+        if LastMintTime == 0 then
+            LastMintTime = msg.Timestamp
+        else
+            LastMintTime = (msg.Timestamp - LastMintTime) // MINT_COOL_DOWN * MINT_COOL_DOWN + LastMintTime
+        end
+        collectgarbage('collect')
+    end)
+    if err then
+        print(err)
+        return err
+    end
+    return "OK"
 end
 
+function Mint.mintBackUp(msg)
+    Mint.mint({ Timestamp = msg.Timestamp })
+end
+
+function Mint.isCronBackup(msg)
+    if msg.Action == "Cron" then
+        return false
+    end
+    if msg.Action == "Eval" then
+        return false
+    end
+    if Mint == "OFF" then
+        return false
+    end
+    return "continue"
+end
 
 return Mint
