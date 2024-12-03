@@ -96,3 +96,14 @@ luaunit.LuaUnit:setOutputType("tap")
 luaunit:setVerbosity(luaunit.VERBOSITY_VERBOSE)
 luaunit.LuaUnit.run()
 ```
+
+# How to deploy
+
+Run with aos console:
+```
+aos [process_name] --sqlite --cron 5-minute
+
+.load apus_token/main.lua
+
+.monitor
+```
