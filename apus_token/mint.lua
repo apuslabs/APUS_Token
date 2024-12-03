@@ -56,7 +56,7 @@ Mint.mint = function(msg)
         end
         local times = (msg.Timestamp - LastMintTime) // MINT_COOL_DOWN
         if LastMintTime == 0 then
-            tiems = 1
+            times = 1
         end
         local deposits = Deposits:getToAllocateUsers()
         if not deposits or #deposits == 0 then

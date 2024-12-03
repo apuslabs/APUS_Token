@@ -40,6 +40,7 @@ Ticker = "Apus"
 -- @TODO: Logo
 Logo = Logo or "SBCCXwwecBlDqRLUjb8dYABExTJXLieawf7m2aBJ-KY"
 
+IsTNComing = IsTNComing or false
 
 --[[
      Add handlers for each incoming Action defined by the ao Standard Token Specification
@@ -115,11 +116,8 @@ end
    ]]
 --
 Token.transfer = function(msg)
-    if MintCount < 100000 then
-        Send({ Target = msg.From, Data = "Transfer is locked!" })
-        return "Transfer is locked"
-    end
     local status, err = pcall(function()
+        assert(IsTNComing, "Cannot transfer until TN")
         assert(type(msg.Recipient) == "string", "Recipient is required!")
         assert(type(msg.Quantity) == "string", "Quantity is required!")
         assert(bint(msg.Quantity) > bint(0), "Quantity must be greater than 0")

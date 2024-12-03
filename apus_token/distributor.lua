@@ -11,6 +11,15 @@ Distributor.bindingWallet = function(user, wallet)
   Deposits:upsert(record)
 end
 
+Distributor.getWallet = function(user)
+  local record = Deposits:getByUser(user) or {
+    User = user,
+    Mint = "0"
+  }
+  return record.Recipient or ""
+end
+
+-- @TEST
 Distributor.testSetWallet = function()
   local records = Deposits:getAll()
   Utils.map(function(r)
