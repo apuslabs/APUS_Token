@@ -14,7 +14,7 @@ Allocator = require('allocator')
 Distributor = require('distributor')
 
 AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
-APUS_STATS_PROCESS = "z-f7CxBzSJHRhhVTZuJI9Iyw5pXjTbcCsPUGfVKvSCk"
+APUS_STATS_PROCESS = "dKPHYeKIxgi-M3oibvf7kvuvY8yM7Klew-ncDbTumnU"
 
 local function isMintReportFromAOMint(msg)
   return msg.Action == "Report.Mint" and msg.From == AO_MINT_PROCESS
@@ -24,6 +24,8 @@ Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   local reports = Utils.filter(function(r)
     return r.Recipient == ao.id
   end, msg.Data)
+  msg.Data = reports
+  msg.forward(APUS_STATS_PROCESS)
   Mint.batchUpdate(reports)
 end)
 Handlers.add("AO-Mint-Report-test", "Report.Mint", function(msg)
