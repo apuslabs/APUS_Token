@@ -26,7 +26,7 @@ function TestMintNormal:setup()
     Mint = require('mint')
 end
 
-local function clear()
+function TestMintNormal:teardown()
     Deposits.dbAdmin:apply("DELETE from Rewards", {})
     MintTimes = 1
     MintedSupply = "80000000000000000000"
@@ -436,6 +436,34 @@ function TestMintNormal:test_06_MintSuccessWontBlock()
     res = Mint.mint({ Timestamp = 550 })
     print(LastMintTime)
     luaunit.assertEquals(res, "Not cool down yet")
+end
+
+
+function TestMintNormal:test_07_Mode()
+    local mintReportList = {}
+
+    table.insert(mintReportList, {
+        Mint = "403089428078",
+        User = "0x6DCeB0F7Dd6bED4fF190D8cA74F67973C280f4B4",
+        Recipient = "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+        Amount = "180000000000000000000",
+        ReportTo = ao.id,
+        Token = "stETH"
+    })
+
+    Mint.batchUpdate(mintReportList)
+
+    Deposits.dbAdmin:apply([[Update Rewards set Recipient = ? where User = ?]],
+        { "FAKE_AR_ADDRESS_1", "0x6DCeB0F7Dd6bED4fF190D8cA74F67973C280f4B4" })
+
+    local releaseAmount = Mint.currentMintAmount()
+    local beforeSupply = MintedSupply
+
+    MODE = "OFF"
+
+    local ret = Mint.mint({ Timestamp = 300, Action = "Cron" })
+    luaunit.assertEquals(MintedSupply, beforeSupply)
+    luaunit.assertEquals(ret, "Not Minting by CRON untils MODE is set to ON")
 end
 
 luaunit.LuaUnit.run()
