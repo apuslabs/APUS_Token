@@ -14,7 +14,7 @@ Allocator = require('allocator')
 Distributor = require('distributor')
 
 AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
-APUS_STATS_PROCESS = "dKPHYeKIxgi-M3oibvf7kvuvY8yM7Klew-ncDbTumnU"
+APUS_STATS_PROCESS = "6JHSYy4r2Qkkw3typw8X6U-oHhg0bme6OyXuryWW8Qw"
 
 local function isMintReportFromAOMint(msg)
   return msg.Action == "Report.Mint" and msg.From == AO_MINT_PROCESS

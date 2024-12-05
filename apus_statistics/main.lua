@@ -13,6 +13,9 @@ AssetStaking = AssetStaking or {}
 AssetAOAmount = AssetAOAmount or {}
 AssetWeight = AssetWeight or {}
 
+MintedSupply = MintedSupply or "0"
+MintCapacity = "1000000000000000000000"
+
 UserMint = {}
 
 local function isMintReportFromAPUSToken(msg)
@@ -91,6 +94,15 @@ local function updateUserMint(mintReports)
   UserMint = newUserMint
 end
 
+Handlers.add("Cron", "Cron", function(msg)
+  Send({
+    Target = APUS_MINT_PROCESS,
+    Action = "Minted-Supply"
+  }).onReply(function(replyMsg)
+    MintedSupply = replyMsg.Data
+  end)
+end)
+
 Handlers.add("Report.Mint", isMintReportFromAPUSToken, function(msg)
   local status, err = pcall(function()
     if #CycleInfo >= Capacity then
@@ -140,11 +152,8 @@ end)
 
 Handlers.add("User.Get-Estimated-Apus-Token", "User.Get-Estimated-Apus-Token", function(msg)
   local status, err = pcall(function()
-    local data = json.decode(msg.Data)
-    local currentMintedSupply = data.currentMintedSupply
-    local token = data.token
-    local amount = data.amount
-    assert(currentMintedSupply ~= nil, "Param currentMintedSupply not exists")
+    local token = msg.Token
+    local amount = msg.Amount
     assert(token ~= nil, "Param token not exists")
     assert(amount ~= nil, "Param amount not exists")
     assert(AssetWeight[token] ~= nil, "Token not support")
@@ -153,11 +162,12 @@ Handlers.add("User.Get-Estimated-Apus-Token", "User.Get-Estimated-Apus-Token", f
     local predictedAOMinted = bintUtils.toBalanceValue(bintUtils.multiply(weight, amount) // bint(10 ^ 18))
     local percent = bint(predictedAOMinted) / (bintUtils.add(predictedAOMinted, TotalMint))
 
-    local predictedMontlyReward = string.format("%.0f", bint(bintUtils.subtract("1000000000000000000000",
-        currentMintedSupply)) * 17 // 1000 *
-      percent)
+    local predictedMontlyReward = bintUtils.toBalanceValue(bintUtils.toBalanceValue((bint(MintCapacity) -
+      bint(MintedSupply)) * 17 // 1000))
 
-    msg.reply({ Data = predictedMontlyReward })
+    local res = bintUtils.toBalanceValue(
+      bint(predictedMontlyReward) * bint(predictedAOMinted) // (bint(predictedAOMinted) + bint(TotalMint)))
+    msg.reply({ Data = res })
   end)
   if err then
     print("Error: " .. err)
@@ -168,19 +178,16 @@ end)
 
 Handlers.add("User.Get-User-Estimated-Apus-Token", "User.Get-User-Estimated-Apus-Token", function(msg)
   local status, err = pcall(function()
-    local data = json.decode(msg.Data)
-    local currentMintedSupply = data.currentMintedSupply
-    local targetUser = data.user
+    local targetUser = msg.User
 
-    assert(currentMintedSupply ~= nil, "Param currentMintedSupply not exists")
     assert(targetUser ~= nil, "Param target user not exists")
 
     local share = UserMint[targetUser] or "0"
     local totalShare = TotalMint
 
     print(share)
-    local predictedMontlyReward = bintUtils.toBalanceValue(bint(bintUtils.subtract("1000000000000000000000",
-      currentMintedSupply)) * 17 // 1000)
+    local predictedMontlyReward = bintUtils.toBalanceValue(bint(bintUtils.subtract(MintCapacity,
+      MintedSupply)) * 17 // 1000)
     local res = bintUtils.toBalanceValue(bint(predictedMontlyReward) * bint(share) // bint(totalShare))
     print(res)
     msg.reply({ Data = res })

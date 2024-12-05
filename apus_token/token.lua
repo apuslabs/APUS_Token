@@ -203,7 +203,7 @@ Token.totalSupply = function(msg)
 end
 
 Token.mintedSupply = function(msg)
-    Send({ Target = msg.From, Data = MintedSupply })
+    msg.reply({ Data = MintedSupply })
     print("Id: " .. msg.From .. " Requested Minted Supply: " .. MintedSupply)
 end
 
