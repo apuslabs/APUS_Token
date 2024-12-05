@@ -46,7 +46,8 @@ end
 
 Mint.mint = function(msg)
     local status, err = pcall(function()
-        if LastMintTime ~= 0 and msg.Timestamp - LastMintTime < MINT_COOL_DOWN then
+        local curTime = msg.Timestamp // 1000
+        if LastMintTime ~= 0 and curTime - LastMintTime < MINT_COOL_DOWN then
             print("Not cool down yet")
             return "Not cool down yet"
         end
@@ -54,7 +55,7 @@ Mint.mint = function(msg)
             print("Not Minting by CRON untils MODE is set to ON")
             return "Not Minting by CRON untils MODE is set to ON"
         end
-        local times = (msg.Timestamp - LastMintTime) // MINT_COOL_DOWN
+        local times = (curTime - LastMintTime) // MINT_COOL_DOWN
         if LastMintTime == 0 then
             times = 1
         end
@@ -77,9 +78,9 @@ Mint.mint = function(msg)
         MintTimes = MintTimes + times
         Deposits:clearMint()
         if LastMintTime == 0 then
-            LastMintTime = msg.Timestamp
+            LastMintTime = curTime
         else
-            LastMintTime = (msg.Timestamp - LastMintTime) // MINT_COOL_DOWN * MINT_COOL_DOWN + LastMintTime
+            LastMintTime = (curTime - LastMintTime) // MINT_COOL_DOWN * MINT_COOL_DOWN + LastMintTime
         end
         collectgarbage('collect')
     end)

@@ -87,5 +87,4 @@ Initialized = Initialized or false
   print("Initializing ...")
   -- Subscribe Mint Report From AO Mint Process
   Send({ Target = AO_MINT_PROCESS, Action = "Recipient.Subscribe-Report", ["Report-To"] = ao.id })
-  Send({ Target = AO_MINT_PROCESS, Action = "Recipient.Subscribe-Report", ["Report-To"] = APUS_STATS_PROCESS })
 end)()
