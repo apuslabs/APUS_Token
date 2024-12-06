@@ -2,6 +2,7 @@ local sqlite3 = require('lsqlite3')
 local json = require('json')
 local Utils = require('.utils')
 local BintUtils = require('utils.bint_utils')
+local EthAddressUtils = require('utils.eth_address')
 
 MintDb = MintDb or sqlite3.open_memory()
 DbAdmin = DbAdmin or require('utils.db_admin').new(MintDb)
@@ -54,6 +55,7 @@ end)
 Handlers.add("User.Balance", "User.Balance", function(msg)
   local user = msg.Recipient
   assert(user ~= nil, "Recipient required")
+  user = EthAddressUtils.toChecksumAddress(user)
   local record = Deposits:getByUser(user) or {}
   local recipient = record.Recipient
   local res = Balances[user] or "0"
