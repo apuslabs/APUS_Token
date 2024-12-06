@@ -16,7 +16,7 @@ AssetWeight = AssetWeight or {}
 MintedSupply = MintedSupply or "0"
 MintCapacity = "1000000000000000000000"
 
-UserMint = {}
+UserMint = UserMint or {}
 
 local function isMintReportFromAPUSToken(msg)
   return msg.Action == "Report.Mint" and msg.From == APUS_MINT_PROCESS
