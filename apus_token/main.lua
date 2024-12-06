@@ -14,7 +14,7 @@ Allocator = require('allocator')
 Distributor = require('distributor')
 
 AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
-APUS_STATS_PROCESS = "6JHSYy4r2Qkkw3typw8X6U-oHhg0bme6OyXuryWW8Qw"
+APUS_STATS_PROCESS = "zmr4sqL_fQjjvHoUJDkT8eqCiLFEM3RV5M96Wd59ffU"
 
 local function isMintReportFromAOMint(msg)
   return msg.Action == "Report.Mint" and msg.From == AO_MINT_PROCESS
@@ -37,6 +37,7 @@ Handlers.add("AO-Mint-Report-test", "Report.Mint", function(msg)
   Mint.batchUpdate(reportList)
 end)
 Handlers.add("Cron", "Cron", Mint.mint)
+Handlers.add("Mint.Backup", "Mint.Backup", Mint.mintBackUp)
 
 Handlers.add("User.Update-Recipient", "User.Update-Recipient", function(msg)
   local user = msg.From
@@ -52,10 +53,7 @@ end)
 
 Handlers.add("User.Balance", "User.Balance", function(msg)
   local user = msg.Recipient
-  if not user then
-    msg.reply({ Data = "Error: Recipient not found." })
-    return
-  end
+  assert(user ~= nil, "Recipient required")
   local record = Deposits:getByUser(user) or {}
   local recipient = record.Recipient
   local res = Balances[user] or "0"
