@@ -211,6 +211,7 @@ end
  Burn
 ]] --
 Token.burn = function(msg)
+    assert(IsTNComing, "Cannot burn until TN")
     assert(type(msg.Quantity) == "string", "Quantity is required!")
     assert(bint(msg.Quantity) <= bint(Balances[msg.From]), "Quantity must be less than or equal to the current balance!")
 

@@ -5,7 +5,6 @@ local BintUtils = require('utils.bint_utils')
 
 -- -- Initialize
 MINT_CAPACITY = "1000000000000000000000" -- 1,000,000,000,000,000,000,000 (1e21) 10 billion
-ApusStatisticsProcess = ApusStatisticsProcess or ""
 
 -- 5 MIN REWARD SUPPLY PERCENT
 -- APUS_Mint_PCT = 21, 243, 598 / 10,000,000,000,000 = 0.0019422
@@ -93,19 +92,6 @@ end
 
 function Mint.mintBackUp(msg)
     Mint.mint({ Timestamp = msg.Timestamp })
-end
-
-function Mint.isCronBackup(msg)
-    if msg.Action == "Cron" then
-        return false
-    end
-    if msg.Action == "Eval" then
-        return false
-    end
-    if Mint == "OFF" then
-        return false
-    end
-    return "continue"
 end
 
 return Mint
