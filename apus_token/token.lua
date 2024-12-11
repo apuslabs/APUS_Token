@@ -1,11 +1,11 @@
--- [[
---     Tokenomics.
--- ]]
+-- Tokenomics Module
+-- Handles token-related operations such as info, balance, transfer, burn, etc.
 Token = { _version = "0.0.1" }
 
 local json = require("json")
 local bint = require(".bint")(256)
 
+-- Utility functions for arithmetic operations
 local utils = {
     add = function(a, b)
         return tostring(bint(a) + bint(b))
@@ -21,25 +21,19 @@ local utils = {
     end
 }
 
---[[
-     Initialize State
-
-     ao.id is equal to the Process.Id
-   ]]
---
+-- Initialize token state variables: ao.id is equal to the Process.Id
 Variant = "0.0.3"
-
 -- token should be idempotent and not change previous state updates
 Denomination = Denomination or 12
+-- Initial balance for the process
 Balances = Balances or { [ao.id] = "80000000000000000000" }
--- 1_000_000_000 Apus Tokens
--- 1_000_000_000_000_000_000 Armstrongs
+-- Total supply of tokens: 1_000_000_000 Apus Tokens; 1_000_000_000_000_000_000 with denomination
 TotalSupply = "1000000000000000000000"
 Name = "Apus"
 Ticker = "Apus"
 -- @TODO: Logo
 Logo = Logo or "SBCCXwwecBlDqRLUjb8dYABExTJXLieawf7m2aBJ-KY"
-
+-- Flag indicating if transfer is enabled
 IsTNComing = IsTNComing or false
 
 --[[
@@ -48,7 +42,8 @@ IsTNComing = IsTNComing or false
 --
 
 --[[
-     Info
+    Handler: Info
+    Responds with token information
    ]]
 --
 Token.info = function(msg)
@@ -71,13 +66,14 @@ end
 
 
 --[[
-     Balance
+    Handler: Balance
+    Returns the balance of a user
    ]]
 --
 Token.balance = function(msg)
     local bal = "0"
 
-    -- If not Recipient is provided, then return the Senders balance
+    -- Determine which balance to fetch based on provided tags
     if (msg.Tags.Recipient and Balances[msg.Tags.Recipient]) then
         bal = Balances[msg.Tags.Recipient]
     elseif msg.Tags.Target and Balances[msg.Tags.Target] then
@@ -86,6 +82,7 @@ Token.balance = function(msg)
         bal = Balances[msg.From]
     end
 
+    -- Send the balance information back to the requester
     ao.send({
         Target = msg.From,
         Balance = bal,
@@ -96,44 +93,34 @@ Token.balance = function(msg)
 end
 
 --[[
-     Balances
-   ]]
---
-Token.balances = function(msg)
-    -- if msg.Format  == "CSV" then
-    --   Send({Target = msg.From, Data = Utils.reduce(function (csv, key)
-    --     csv = csv .. key .. "," .. Balances[key] .. "\n"
-    --     return csv
-    --   end, "", Utils.keys(Balances))})
-    --   print('got data')
-    --   return "ok"
-    -- end
-    -- ao.send({ Target = msg.From, Data = Balances })
-    Send({ Target = msg.From, Data = "{}", Note = "Feature disabled" })
-end
---[[
-     Transfer
+    Handler: Transfer
+    Transfers tokens from one user to another
+    Note: Currently disabled until TN (Transfer Notice?) is implemented
    ]]
 --
 Token.transfer = function(msg)
     local status, err = pcall(function()
+        -- Ensure that transfers are enabled
         assert(IsTNComing, "Cannot transfer until TN")
+        -- Validate message parameters
         assert(type(msg.Recipient) == "string", "Recipient is required!")
         assert(type(msg.Quantity) == "string", "Quantity is required!")
         assert(bint(msg.Quantity) > bint(0), "Quantity must be greater than 0")
-
+        -- Initialize balances if not present
         if not Balances[msg.From] then Balances[msg.From] = "0" end
         if not Balances[msg.Recipient] then Balances[msg.Recipient] = "0" end
-
+        -- Check if sender has sufficient balance
         if bint(msg.Quantity) <= bint(Balances[msg.From]) then
+            -- Subtract from sender and add to recipient
             Balances[msg.From] = utils.subtract(Balances[msg.From], msg.Quantity)
             Balances[msg.Recipient] = utils.add(Balances[msg.Recipient], msg.Quantity)
 
             --[[
-          Only send the notifications to the Sender and Recipient
-          if the Cast tag is not set on the Transfer message
-        ]]
+                Only send the notifications to the Sender and Recipient
+                if the Cast tag is not set on the Transfer message
+            ]]
             --
+            -- If the transfer message is not a cast, send notices
             if not msg.Cast then
                 -- Debit-Notice message template, that is sent to the Sender of the transfer
                 local debitNotice = {
@@ -172,6 +159,7 @@ Token.transfer = function(msg)
                 ao.send(creditNotice)
             end
         else
+            -- Insufficient balance; send error message
             ao.send({
                 Target = msg.From,
                 Action = "Transfer-Error",
@@ -180,6 +168,7 @@ Token.transfer = function(msg)
             })
         end
     end)
+    -- Handle any errors that occurred during the transfer process
     if err then
         Send({ Target = msg.From, Data = err })
         return err
@@ -188,12 +177,14 @@ Token.transfer = function(msg)
 end
 
 --[[
-     Total Supply
-   ]]
---
+    Handler: Total Supply
+    Returns the total supply of tokens
+]]--
 Token.totalSupply = function(msg)
+    -- Prevent self-calls to avoid potential infinite loops or conflicts
     assert(msg.From ~= ao.id, "Cannot call Total-Supply from the same process!")
 
+    -- Send the total supply information back to the requester
     ao.send({
         Target = msg.From,
         Action = "Total-Supply",
@@ -202,22 +193,30 @@ Token.totalSupply = function(msg)
     })
 end
 
+--[[
+    Handler: Minted Supply
+    Returns the minted supply of tokens
+]]
 Token.mintedSupply = function(msg)
     msg.reply({ Data = MintedSupply })
     print("Id: " .. msg.From .. " Requested Minted Supply: " .. MintedSupply)
 end
 
 --[[
- Burn
-]] --
+    Handler: Burn
+    Burns a specified quantity of tokens from the user's balance
+]]
 Token.burn = function(msg)
+    -- Validate the quantity to burn
     assert(IsTNComing, "Cannot burn until TN")
     assert(type(msg.Quantity) == "string", "Quantity is required!")
     assert(bint(msg.Quantity) <= bint(Balances[msg.From]), "Quantity must be less than or equal to the current balance!")
 
+    -- Subtract the quantity from the user's balance and total supply
     Balances[msg.From] = utils.subtract(Balances[msg.From], msg.Quantity)
     TotalSupply = utils.subtract(TotalSupply, msg.Quantity)
 
+    -- Confirm successful burn to the user
     ao.send({
         Target = msg.From,
         Data = Colors.gray .. "Successfully burned " .. Colors.blue .. msg.Quantity .. Colors.reset
