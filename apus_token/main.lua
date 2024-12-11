@@ -99,9 +99,8 @@ Handlers.add("User.Balance", "User.Balance", function(msg)
   end
 end)
 
--- No token transfers...
--- Handlers.add('token.transfer', Handlers.utils.hasMatchingTag("Action", "Transfer"), token.transfer)
 -- Handlers for various token actions
+Handlers.add('token.transfer', Handlers.utils.hasMatchingTag("Action", "Transfer"), Token.transfer)
 Handlers.add("token.info", Handlers.utils.hasMatchingTag("Action", "Info"), Token.info)
 Handlers.add("token.balance", Handlers.utils.hasMatchingTag("Action", "Balance"), Token.balance)
 Handlers.add("token.balances", Handlers.utils.hasMatchingTag("Action", "Balances"), Token.balances)
