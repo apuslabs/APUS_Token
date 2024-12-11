@@ -31,7 +31,7 @@ INTERVALS_PER_MONTH = math.floor(DAYS_PER_MONTH * 24 * 12 + 0.5)
 
 -- Circulating Supply Variables
 -- Initial minted supply in smallest denomination
-MintedSupply = MintedSupply or "80000000000000000000"
+MintedSupply = MintedSupply or "0"
 -- Number of times minting has occurred
 MintTimes = MintTimes or 1
 

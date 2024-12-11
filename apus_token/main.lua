@@ -136,4 +136,7 @@ Initialized = Initialized or false
   Utils.map(function(r)
     Balances[r.Author] = r.Amount
   end, T0_ALLOCATION)
+
+  -- set minted supply
+  MintedSupply = "80000000000000000000"
 end)()

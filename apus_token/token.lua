@@ -26,7 +26,7 @@ Variant = "0.0.3"
 -- token should be idempotent and not change previous state updates
 Denomination = Denomination or 12
 -- Initial balance for the process
-Balances = Balances or { [ao.id] = "80000000000000000000" }
+Balances = Balances or {}
 -- Total supply of tokens: 1_000_000_000 Apus Tokens; 1_000_000_000_000_000_000 with denomination
 TotalSupply = "1000000000000000000000"
 -- Flag indicating if transfer is enabled
@@ -169,7 +169,7 @@ end
 --[[
     Handler: Total Supply
     Returns the total supply of tokens
-]]--
+]] --
 Token.totalSupply = function(msg)
     -- Prevent self-calls to avoid potential infinite loops or conflicts
     assert(msg.From ~= ao.id, "Cannot call Total-Supply from the same process!")

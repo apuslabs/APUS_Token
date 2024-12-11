@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "@permaweb/ao-loader": "^0.0.43",
+    "axios": "^1.7.9",
     "dayjs": "^1.11.13",
+    "ethereumjs-util": "^7.1.5",
     "fs-extra": "^11.2.0"
   },
   "name": "apus_token",
