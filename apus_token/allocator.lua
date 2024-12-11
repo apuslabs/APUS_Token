@@ -38,6 +38,7 @@ function Allocator:compute(deposits, reward)
         return
     end
 
+    -- If there are remaining rewards, assign them to the first deposit
     if bint(left) > 0 then
         deposits[1].Reward = BintUtils.add(deposits[1].Reward, left)
     end
