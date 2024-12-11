@@ -22,12 +22,16 @@ Token = require('token')
 Allocator = require('allocator')
 Distributor = require('distributor')
 
-AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
-APUS_STATS_PROCESS = "zmr4sqL_fQjjvHoUJDkT8eqCiLFEM3RV5M96Wd59ffU"
+require('config')
 
 -- Function to verify if a message is a mint report from AO Mint Process
 local function isMintReportFromAOMint(msg)
   return msg.Action == "Report.Mint" and msg.From == AO_MINT_PROCESS
+end
+
+-- Function to verify if a message can be processed with the target handler
+local function isMintBackupAuthorized(msg)
+  return msg.Action == "Mint.Backup" and (msg.From == ao.env.Process.Owner or msg.From == ao.id)
 end
 
 -- Handler for AO Mint Report
@@ -61,7 +65,7 @@ end)
 Handlers.add("Cron", "Cron", Mint.mint)
 
 -- Handler for Mint Backup process (MODE = "OFF")
-Handlers.add("Mint.Backup", "Mint.Backup", Mint.mintBackUp)
+Handlers.add("Mint.Backup", isMintBackupAuthorized, Mint.mintBackUp)
 
 -- Handler to update user's recipient wallet
 Handlers.add("User.Update-Recipient", "User.Update-Recipient", function(msg)
@@ -121,4 +125,15 @@ Initialized = Initialized or false
   print("Initializing ...")
   -- Subscribe Mint Report From AO Mint Process
   Send({ Target = AO_MINT_PROCESS, Action = "Recipient.Subscribe-Report", ["Report-To"] = ao.id })
+
+  -- check if the sum is 8% of the total supply
+  local sum = Utils.reduce(function(acc, value)
+    return BintUtils.add(acc, value.Amount)
+  end, "0", T0_ALLOCATION)
+  assert(sum == "80000000000000000000")
+
+  -- set balance for each user
+  Utils.map(function(r)
+    Balances[r.Author] = r.Amount
+  end, T0_ALLOCATION)
 end)()

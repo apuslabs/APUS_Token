@@ -29,10 +29,6 @@ Denomination = Denomination or 12
 Balances = Balances or { [ao.id] = "80000000000000000000" }
 -- Total supply of tokens: 1_000_000_000 Apus Tokens; 1_000_000_000_000_000_000 with denomination
 TotalSupply = "1000000000000000000000"
-Name = "Apus"
-Ticker = "Apus"
--- @TODO: Logo
-Logo = Logo or "SBCCXwwecBlDqRLUjb8dYABExTJXLieawf7m2aBJ-KY"
 -- Flag indicating if transfer is enabled
 IsTNComing = IsTNComing or false
 
@@ -54,12 +50,6 @@ Token.info = function(msg)
         Ticker = Ticker,
         Logo = Logo,
         Denomination = tostring(Denomination),
-        -- @TODO: Mirror service of the process
-        -- ['Balance-Mirror'] = "ptCu-Un-3FF8sZ5zNMYg43zRgSYAGVkjz2Lb0HZmx2M",
-        -- ['Balances-Mirror'] = "ptCu-Un-3FF8sZ5zNMYg43zRgSYAGVkjz2Lb0HZmx2M",
-
-        -- @TODO: Unnecessary
-        -- MintCount = tostring(MintCount),
         Action = "Info-Response"
     })
 end
@@ -214,7 +204,7 @@ Token.burn = function(msg)
 
     -- Subtract the quantity from the user's balance and total supply
     Balances[msg.From] = utils.subtract(Balances[msg.From], msg.Quantity)
-    TotalSupply = utils.subtract(TotalSupply, msg.Quantity)
+    Balances["DEAD"] = utils.add(Balances["DEAD"] or "0", msg.Quantity)
 
     -- Confirm successful burn to the user
     ao.send({

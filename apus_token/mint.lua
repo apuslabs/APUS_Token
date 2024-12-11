@@ -35,10 +35,10 @@ MintedSupply = MintedSupply or "80000000000000000000"
 -- Number of times minting has occurred
 MintTimes = MintTimes or 1
 
--- Minting cycle interval in seconds
-MINT_COOL_DOWN = 300
 -- Timestamp of the last minting
 LastMintTime = LastMintTime or 0
+TotalMintIsZero = TotalMintIsZero or false
+
 -- Current minting mode ("ON" or "OFF"), ON: auto-mint; OFF: manual-mint
 MODE = MODE or "OFF"
 
@@ -54,6 +54,14 @@ MODE = MODE or "OFF"
         string: "OK" indicating successful update.
 ]]
 Mint.batchUpdate = function(mintReportList)
+    -- check if sum of mint equals zero
+    local mintSum = Utils.reduce(function(acc, value)
+        return BintUtils.add(acc, value.Mint)
+    end, "0", mintReportList)
+    if mintSum == "0" then
+        -- if total mint is zero, set TotalMintIsZero to true for burning
+        TotalMintIsZero = true
+    end
     -- Iterate over each mint report and update the corresponding user's mint information
     Utils.map(function(mintReport)
         Deposits:updateMintForUser(mintReport.User, mintReport.Mint)
@@ -117,31 +125,47 @@ Mint.mint = function(msg)
 
         -- Retrieve the list of users eligible for minting
         local deposits = Deposits:getToAllocateUsers()
-        if not deposits or #deposits == 0 then
+        if not deposits or #deposits == 0 and not TotalMintIsZero then
             print("No users in the pool.")
             return "No users in the pool."
         end
 
-        -- Perform minting for the calculated number of times
-        for i = 1, times do
-            -- Determine the amount to be minted in this iteration
-            local releaseAmount = Mint.currentMintAmount()
-            -- Compute the reward for each user based on their deposit
-            local depositsWithReward = Allocator:compute(deposits, releaseAmount)
-            -- Update each user's balance with the calculated reward
-            Utils.map(function(r)
-                Balances[r.Recipient] = BintUtils.add(Balances[r.Recipient] or "0", r.Reward)
-            end, depositsWithReward)
-            -- Update the total minted supply by summing all user balances
-            MintedSupply = Utils.reduce(function(acc, v)
-                return BintUtils.add(acc, v)
-            end, "0", Utils.values(Balances))
-        end
+        if not deposits or #deposits == 0 and TotalMintIsZero then
+            -- reset the flag
+            TotalMintIsZero = false
+            -- total mint is zero, which results in no eligible users. Actually the process received mint reports.
+            for i = 1, times do
+                -- Determine the amount to be minted in this iteration
+                local releaseAmount = Mint.currentMintAmount()
+                -- burn the token by adding amount for balance of DEAD address
+                Balances["DEAD"] = BintUtils.add(Balances["DEAD"] or "0", releaseAmount)
+                -- Update the total minted supply by adding releaseAmount
+                MintedSupply = BintUtils.add(MintedSupply, releaseAmount)
+                -- Increment the number of times minting has occurred
+                MintTimes = MintTimes + 1
+            end
+        else
+            -- Perform minting for the calculated number of times
+            for i = 1, times do
+                -- Determine the amount to be minted in this iteration
+                local releaseAmount = Mint.currentMintAmount()
+                -- Compute the reward for each user based on their deposit
+                local depositsWithReward = Allocator:compute(deposits, releaseAmount)
+                -- Update each user's balance with the calculated reward
+                Utils.map(function(r)
+                    Balances[r.Recipient] = BintUtils.add(Balances[r.Recipient] or "0", r.Reward)
+                end, depositsWithReward)
+                -- Update the total minted supply by summing all user balances
+                MintedSupply = Utils.reduce(function(acc, v)
+                    return BintUtils.add(acc, v)
+                end, "0", Utils.values(Balances))
+                -- Increment the number of times minting has occurred
+                MintTimes = MintTimes + 1
+            end
 
-        -- Increment the number of times minting has occurred
-        MintTimes = MintTimes + times
-        -- Clear the minting records from the Deposits module
-        Deposits:clearMint()
+            -- Clear the minting records from the Deposits module
+            Deposits:clearMint()
+        end
 
         -- Update the timestamp of the last minting
         if LastMintTime == 0 then
