@@ -95,7 +95,7 @@ end
 --[[
     Handler: Transfer
     Transfers tokens from one user to another
-    Note: Currently disabled until TN (Transfer Notice?) is implemented
+    Note: Currently disabled until TN (Liquidity Trigger Event) is implemented
    ]]
 --
 Token.transfer = function(msg)
