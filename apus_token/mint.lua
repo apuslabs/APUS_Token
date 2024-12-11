@@ -44,7 +44,8 @@ MODE = MODE or "OFF"
 
 --[[
     Function: batchUpdate
-    Batch updates minting information for a list of mint reports.
+    Batch updates minting information according to a list of mint reports.
+
 
     Parameters:
         mintReportList (table): A list of mint reports, each containing a User and Mint amount.
