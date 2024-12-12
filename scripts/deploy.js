@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml';
 import { connect, createDataItemSigner } from "@permaweb/aoconnect"
+import os from 'os';
 
 const _arweave = Arweave.init()
 
@@ -108,7 +109,7 @@ function _load(filePath) {
 
 async function _getAOWallet() {
   const _arweave = Arweave.init()
-  const jwk = JSON.parse(fs.readFileSync(path.resolve(process.env.OWNER_JSON_LOCATION || "~/.aos.json"), 'utf-8'))
+  const jwk = JSON.parse(fs.readFileSync(path.resolve(process.env.OWNER_JSON_LOCATION || `${os.homedir()}/.aos.json`), 'utf-8'))
   const address = await _arweave.wallets.jwkToAddress(jwk)
   return { jwk, address }
 }
