@@ -37,8 +37,6 @@ MintTimes = MintTimes or 1
 
 -- Timestamp of the last minting
 LastMintTime = LastMintTime or 0
--- Current minting mode ("ON" or "OFF"), ON: auto-mint; OFF: manual-mint
-MODE = MODE or "OFF"
 
 --[[
     Function: batchUpdate
