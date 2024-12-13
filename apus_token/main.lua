@@ -22,8 +22,7 @@ Token = require('token')
 Allocator = require('allocator')
 Distributor = require('distributor')
 
-AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
-APUS_STATS_PROCESS = "zmr4sqL_fQjjvHoUJDkT8eqCiLFEM3RV5M96Wd59ffU"
+require('config')
 
 -- Function to verify if a message is a mint report from AO Mint Process
 local function isMintReportFromAOMint(msg)
@@ -121,4 +120,20 @@ Initialized = Initialized or false
   print("Initializing ...")
   -- Subscribe Mint Report From AO Mint Process
   Send({ Target = AO_MINT_PROCESS, Action = "Recipient.Subscribe-Report", ["Report-To"] = ao.id })
+
+  -- check if the sum is 8% of the total supply
+  local sum = Utils.reduce(function(acc, value)
+    return BintUtils.add(acc, value.Amount)
+  end, "0", T0_ALLOCATION)
+  assert(sum == "80000000000000000000")
+
+  -- set balance for each user
+  Utils.map(function(r)
+    Balances[r.Author] = BintUtils.add(Balances[r.Author] or "0", r.Amount)
+  end, T0_ALLOCATION)
+
+  -- set minted supply
+  MintedSupply = Utils.reduce(function(acc, value)
+    return BintUtils.add(acc, value)
+  end, "0", Utils.values(Balances))
 end)()

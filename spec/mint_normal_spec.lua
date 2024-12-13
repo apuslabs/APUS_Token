@@ -12,6 +12,7 @@ Mint = nil
 Allocator = require('allocator')
 
 Balances = { ["ADDRESS_1"] = "80000000000000000000" }
+MintedSupply = "80000000000000000000"
 
 GetCurrentTime = function()
     return 112233
@@ -24,6 +25,8 @@ function TestMintNormal:setup()
     Deposits = require('dal.deposits').new(DbAdmin)
 
     Mint = require('mint')
+    require('config')
+    MODE = "ON"
 end
 
 function TestMintNormal:teardown()
@@ -43,7 +46,6 @@ function TestMintNormal:test_01_Basic()
     luaunit.assertNotNil(Deposits)
 
     luaunit.assertEquals(MINT_CAPACITY, "1000000000000000000000")
-    luaunit.assertEquals(ApusStatisticsProcess, "")
     -- luaunit.assertEquals(APUS_MINT_PCT_1, 194218390)
     -- luaunit.assertEquals(APUS_MINT_PCT_2, 164733613)
     luaunit.assertEquals(INTERVALS_PER_YEAR, 365.25 * 24 * 12)
@@ -128,8 +130,6 @@ function TestMintNormal:test_02_Insert()
     luaunit.assertEquals(Deposits:getByUser("0x0d386297c95C7e48db734E3Eb2F476CD73f92E59").Recipient, "")
     luaunit.assertEquals(Deposits:getByUser("0x7300782D46E385B1D0B4e831D48c4224F502ECb9").Recipient, "")
     luaunit.assertEquals(Deposits:getByUser("0x43C68e2C3Fc96b077d19e503a609a83Cb4D0c6fA").Recipient, "")
-
-    clear()
 end
 
 -- [[
@@ -210,7 +210,7 @@ function TestMintNormal:test_03_AllocateWithoutBinding()
     luaunit.assertEquals(Deposits:getByUser("0x43C68e2C3Fc96b077d19e503a609a83Cb4D0c6fA").Recipient, "")
 
     local beforeSupply = MintedSupply
-    Mint.mint({ Timestamp = 300 })
+    Mint.mint({ Timestamp = 300000 })
     local afterSupply = MintedSupply
     luaunit.assertEquals(BintUtils.subtract(afterSupply, beforeSupply), "0")
     luaunit.assertIsNil(Balances["0x6DCeB0F7Dd6bED4fF190D8cA74F67973C280f4B4"])
@@ -219,8 +219,6 @@ function TestMintNormal:test_03_AllocateWithoutBinding()
     luaunit.assertIsNil(Balances["0x0d386297c95C7e48db734E3Eb2F476CD73f92E59"])
     luaunit.assertIsNil(Balances["0x7300782D46E385B1D0B4e831D48c4224F502ECb9"])
     luaunit.assertIsNil(Balances["0x43C68e2C3Fc96b077d19e503a609a83Cb4D0c6fA"])
-
-    clear()
 end
 
 -- [[
@@ -317,7 +315,7 @@ function TestMintNormal:test_04_AllocateWithUsersBinded()
     local releaseAmount = Mint.currentMintAmount()
     local beforeSupply = MintedSupply
 
-    Mint.mint({ Timestamp = 300 })
+    Mint.mint({ Timestamp = 300000 })
     luaunit.assertIsTrue(BintUtils.subtract(MintedSupply, beforeSupply) > bint(0))
     -- luaunit.assertEquals(MintedSupply, "0")
     -- luaunit.assertEquals(Deposits:getByUser("0x6DCeB0F7Dd6bED4fF190D8cA74F67973C280f4B4").Mint, "0")
@@ -328,14 +326,13 @@ function TestMintNormal:test_04_AllocateWithUsersBinded()
     -- luaunit.assertEquals(Deposits:getByUser("0x43C68e2C3Fc96b077d19e503a609a83Cb4D0c6fA").Mint, "0")
 
     -- print(Balances)
-    clear()
 end
 
 function TestMintNormal:test_05_MintFailWontBlock()
     local res
-    res = Mint.mint({ Timestamp = 300 })
+    res = Mint.mint({ Timestamp = 300000 })
     luaunit.assertEquals(res, "No users in the pool.")
-    res = Mint.mint({ Timestamp = 300 })
+    res = Mint.mint({ Timestamp = 300000 })
     luaunit.assertEquals(res, "No users in the pool.")
 end
 
@@ -430,14 +427,13 @@ function TestMintNormal:test_06_MintSuccessWontBlock()
     local releaseAmount = Mint.currentMintAmount()
     local beforeSupply = MintedSupply
 
-    res = Mint.mint({ Timestamp = 300 })
+    res = Mint.mint({ Timestamp = 300000 })
     luaunit.assertIsTrue(BintUtils.subtract(MintedSupply, beforeSupply) > bint(0))
     luaunit.assertEquals(res, "OK")
-    res = Mint.mint({ Timestamp = 550 })
+    res = Mint.mint({ Timestamp = 550000 })
     print(LastMintTime)
     luaunit.assertEquals(res, "Not cool down yet")
 end
-
 
 function TestMintNormal:test_07_Mode()
     local mintReportList = {}
@@ -461,7 +457,7 @@ function TestMintNormal:test_07_Mode()
 
     MODE = "OFF"
 
-    local ret = Mint.mint({ Timestamp = 300, Action = "Cron" })
+    local ret = Mint.mint({ Timestamp = 300000, Action = "Cron" })
     luaunit.assertEquals(MintedSupply, beforeSupply)
     luaunit.assertEquals(ret, "Not Minting by CRON untils MODE is set to ON")
 end
