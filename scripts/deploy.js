@@ -4,10 +4,15 @@ import path from 'path'
 import yaml from 'js-yaml';
 import { connect, createDataItemSigner } from "@permaweb/aoconnect"
 import os from 'os';
+import { Config } from '@alicloud/openapi-client';
 
 const _arweave = Arweave.init()
 
-let CHECKINGS = {}
+let ConfigWithoutT0Allocation = {}
+let T0Allocation = {}
+
+const DELAY_MS = 5000
+
 function _exploreNodes(node, cwd) {
   if (!fs.existsSync(node.path)) return []
 
@@ -213,99 +218,207 @@ async function _sendMonitorCommand(process) {
   return res
 }
 
-const Config = {
-  ApusTokenProcessName: "ATPN-0.0.19",
-  ApusStatsProcessName: 'ASPN-0.0.19',
-  DeployDelayMs: 5000
+function getEntireConfig() {
+  const _conf = JSON.parse(JSON.stringify(ConfigWithoutT0Allocation));
+  _conf.APUS_TOKEN_PROCESS.Config.T0Allocation = T0Allocation
+  return _conf
+}
+
+function generateConfigLua(config) {
+  const apusTokenConfig = config.APUS_TOKEN_PROCESS.Config
+  return `-- AO Addresses
+AO_MINT_PROCESS = "${apusTokenConfig.Main.AO_MINT_PROCESS}"
+APUS_STATS_PROCESS = "${apusTokenConfig.Main.APUS_STATS_PROCESS} "
+
+--Minting cycle interval in seconds
+MINT_COOL_DOWN = ${apusTokenConfig.Mint.MINT_COOL_DOWN}
+
+--Tokenomics
+Name = "${apusTokenConfig.Token.Name}"
+Ticker = "${apusTokenConfig.Token.Ticker}"
+Logo = "${apusTokenConfig.Token.Logo}"
+
+-- Current minting mode ("ON" or "OFF"), ON: auto-mint; OFF: manual-mint
+MODE = MODE or "ON"
+
+--T0 token receivers
+T0_ALLOCATION = {
+  --1 % to liquidity
+  { Author = "${apusTokenConfig.T0Allocation[0].Author}", Amount = "${apusTokenConfig.T0Allocation[0].Amount}" },
+
+  --5 % to pool bootstrap
+  { Author = "${apusTokenConfig.T0Allocation[1].Author}", Amount = "${apusTokenConfig.T0Allocation[1].Amount}" },
+
+  --2 % to contributors
+${apusTokenConfig.T0Allocation.slice(2).map((r) => {
+    return `  { Author = "${r.Author}", Amount = "${r.Amount}" }`
+  }).join(",\n")
+    }
+}
+
+return {}`
+}
+
+async function prepareConfig() {
+  if (!fs.existsSync('deploy/')) {
+    fs.mkdirSync('deploy/')
+  }
+  if (!fs.existsSync('deploy/config.yml', 'utf-8')) {
+    fs.writeFileSync('deploy/config.yml', yaml.dump({
+      APUS_TOKEN_PROCESS: {
+        Name: "APUS_RC0",
+        Config: {
+          Token: {
+            Name: "APUS Release Candidate 0",
+            Ticker: "APUS_RC0",
+            Logo: "tesHcQpU6KWRMflKUnJpcsTCVwjV6BTaWLx_BV233JU"
+          },
+          Mint: {
+            MINT_COOL_DOWN: 300
+          },
+          Main: {
+            AO_MINT_PROCESS: "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw",
+            APUS_STATS_PROCESS: "zmr4sqL_fQjjvHoUJDkT8eqCiLFEM3RV5M96Wd59ffU"
+          }
+        },
+        Process: {
+          ID: null
+        },
+        DeployProgress: {
+          DEPLOY: "PENDING",
+          LOAD_LUA: "PENDING",
+          MONITOR: "PENDING",
+          INITIALIZE: "PENDING"
+        }
+      },
+      APUS_STATS_PROCESS: {
+        Name: "APUS_STATS_RC0",
+        Config: {
+          Main: {
+            APUS_MINT_PROCESS: ""
+          }
+        },
+        Process: {
+          ID: null
+        },
+        DeployProgress: {
+          DEPLOY: "PENDING",
+          LOAD_LUA: "PENDING",
+          MONITOR: "PENDING",
+          INITIALIZE: "PENDING"
+        }
+      }
+    }))
+    return "Created default config, please set the config for it"
+  }
+
+  ConfigWithoutT0Allocation = yaml.load(fs.readFileSync('deploy/config.yml', 'utf-8'))
+  T0Allocation = yaml.load(fs.readFileSync('deploy/T0_allocation.yml', 'utf-8'))
+
+  // console.log(generateConfigLua(getEntireConfig()))
 }
 
 async function preparationCheck() {
   // make sure target process not exist
-  if (!CHECKINGS.APUS_TOKEN_PROCESS.PROCESS) {
+  if (!ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Process.ID) {
+    console.log("START APUS_TOKEN_PROCESS NAME_DUPLICATE_CHECK")
     let checkProcessExistRes
-    checkProcessExistRes = await _getProcessIDByName(Config.ApusTokenProcessName)
+    checkProcessExistRes = await _getProcessIDByName(ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Name)
     if (checkProcessExistRes) {
-      return `Process named with '${Config.ApusTokenProcessName}' exists, process: ${checkProcessExistRes}, please check.`
+      return `FAIL APUS_TOKEN_PROCESS NAME_DUPLICATE_CHECK`
     }
+    console.log("PASS APUS_TOKEN_PROCESS NAME_DUPLICATE_CHECK")
   }
-  if (!CHECKINGS.APUS_STATS_PROCESS.PROCESS) {
+  if (!ConfigWithoutT0Allocation.APUS_STATS_PROCESS.Process.ID) {
+    console.log("START APUS_STATS_PROCESS NAME_DUPLICATE_CHECK")
     let checkProcessExistRes
-    checkProcessExistRes = await _getProcessIDByName(Config.ApusStatsProcessName)
+    checkProcessExistRes = await _getProcessIDByName(ConfigWithoutT0Allocation.APUS_STATS_PROCESS.Name)
     if (checkProcessExistRes) {
-      return `Process named with '${Config.ApusStatsProcessName}' exists, process: ${checkProcessExistRes}, please check.`
+      return `FAIL APUS_STATS_PROCESS NAME_DUPLICATE_CHECK`
     }
+    console.log("PASS APUS_STATS_PROCESS NAME_DUPLICATE_CHECK")
   }
   return null
 }
 
 async function deployProcess() {
-  if (CHECKINGS.APUS_TOKEN_PROCESS.DEPLOY != 'OK') {
+  if (ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.DeployProgress.DEPLOY != 'OK') {
+    console.log("START APUS_TOKEN_PROCESS DEPLOYMENT.")
     const apusTokenProcess = await _createProcess({
-      name: Config.ApusTokenProcessName,
+      name: ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Name,
       cron: "5-minutes",
       ifSqlite: true
     })
 
-    CHECKINGS.APUS_TOKEN_PROCESS.PROCESS = apusTokenProcess
-    CHECKINGS.APUS_TOKEN_PROCESS.NAME = Config.ApusTokenProcessName
-    CHECKINGS.APUS_TOKEN_PROCESS.DEPLOY = "OK"
-    fs.writeFileSync('tmp/deploy_progress.yml', yaml.dump(CHECKINGS))
+    ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Process.ID = apusTokenProcess
+    ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.DeployProgress.DEPLOY = "OK"
+    fs.writeFileSync('deploy/config.yml', yaml.dump(ConfigWithoutT0Allocation))
 
     console.log("PASS APUS_TOKEN_PROCESS DEPLOYMENT.")
-    await delay(Config.DeployDelayMs)
+    await delay(DELAY_MS)
   } else {
     console.log("SKIP APUS_TOKEN_PROCESS DEPLOYMENT.")
   }
 
-  if (CHECKINGS.APUS_TOKEN_PROCESS.LOAD_LUA != 'OK') {
-    await _sendMessageAndGetResult(CHECKINGS.APUS_TOKEN_PROCESS.PROCESS, _load('apus_token/main.lua')[0])
-    CHECKINGS.APUS_TOKEN_PROCESS.LOAD_LUA = 'OK'
-    fs.writeFileSync('tmp/deploy_progress.yml', yaml.dump(CHECKINGS))
+  if (ConfigWithoutT0Allocation.APUS_STATS_PROCESS.DeployProgress.DEPLOY != 'OK') {
+    console.log("START APUS_STATS_PROCESS DEPLOYMENT.")
+    const apusStatsProcess = await _createProcess({
+      name: ConfigWithoutT0Allocation.APUS_STATS_PROCESS.Name,
+      cron: "5-minutes",
+      ifSqlite: false
+    })
+
+    ConfigWithoutT0Allocation.APUS_STATS_PROCESS.Process.ID = apusStatsProcess
+    ConfigWithoutT0Allocation.APUS_STATS_PROCESS.DeployProgress.DEPLOY = "OK"
+    fs.writeFileSync('deploy/config.yml', yaml.dump(ConfigWithoutT0Allocation))
+
+    console.log("PASS APUS_STATS_PROCESS DEPLOYMENT.")
+    await delay(DELAY_MS)
+  } else {
+    console.log("SKIP APUS_STATS_PROCESS DEPLOYMENT.")
+  }
+
+  ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Config.Main.APUS_STATS_PROCESS = ConfigWithoutT0Allocation.APUS_STATS_PROCESS.Process.ID
+  ConfigWithoutT0Allocation.APUS_STATS_PROCESS.Config.Main.APUS_MINT_PROCESS = ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Process.ID
+
+  // overwrite the apus_token/main.lua
+  fs.writeFileSync("apus_token/config.lua", generateConfigLua(getEntireConfig()))
+  fs.writeFileSync("apus_statistics/main.lua", fs.readFileSync('apus_statistics/main.lua', 'utf-8').replace(/APUS_MINT_PROCESS = APUS_MINT_PROCESS or "[a-z0-9A-Z\-_]+"/, `APUS_MINT_PROCESS = APUS_MINT_PROCESS or "${ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Process.ID}"`))
+
+  if (ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.DeployProgress.LOAD_LUA != 'OK') {
+    console.log("START APUS_TOKEN_PROCESS LOAD_LUA.")
+    await _sendMessageAndGetResult(ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Process.ID, _load('apus_token/main.lua')[0])
+    ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.DeployProgress.LOAD_LUA = 'OK'
+    fs.writeFileSync('deploy/config.yml', yaml.dump(ConfigWithoutT0Allocation))
     console.log("PASS APUS_TOKEN_PROCESS LOAD_LUA.")
   } else {
     console.log("SKIP APUS_TOKEN_PROCESS LOAD_LUA.")
   }
 
-  if (CHECKINGS.APUS_TOKEN_PROCESS.MONITOR != 'OK') {
-    await _sendMonitorCommand(CHECKINGS.APUS_TOKEN_PROCESS.PROCESS)
-    CHECKINGS.APUS_TOKEN_PROCESS.MONITOR = 'OK'
-    fs.writeFileSync('tmp/deploy_progress.yml', yaml.dump(CHECKINGS))
+  if (ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.DeployProgress.MONITOR != 'OK') {
+    console.log("START APUS_TOKEN_PROCESS MONITOR.")
+    await _sendMonitorCommand(ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.Process.ID)
+    ConfigWithoutT0Allocation.APUS_TOKEN_PROCESS.DeployProgress.MONITOR = 'OK'
+    fs.writeFileSync('deploy/config.yml', yaml.dump(ConfigWithoutT0Allocation))
     console.log("PASS APUS_TOKEN_PROCESS MONITOR.")
   } else {
     console.log("SKIP APUS_TOKEN_PROCESS MONITOR.")
   }
 
-  if (CHECKINGS.APUS_STATS_PROCESS.DEPLOY != 'OK') {
-    const apusStatsProcess = await _createProcess({
-      name: Config.ApusStatsProcessName,
-      cron: "5-minutes",
-      ifSqlite: false
-    })
-
-    CHECKINGS.APUS_STATS_PROCESS.PROCESS = apusStatsProcess
-    CHECKINGS.APUS_STATS_PROCESS.NAME = Config.ApusStatsProcessName
-    CHECKINGS.APUS_STATS_PROCESS.DEPLOY = "OK"
-    fs.writeFileSync('tmp/deploy_progress.yml', yaml.dump(CHECKINGS))
-
-    console.log("PASS APUS_STATS_PROCESS DEPLOYMENT.")
-    await delay(Config.DeployDelayMs)
-  } else {
-    console.log("SKIP APUS_STATS_PROCESS DEPLOYMENT.")
-  }
-
-
-  if (CHECKINGS.APUS_STATS_PROCESS.LOAD_LUA != 'OK') {
-    await _sendMessageAndGetResult(CHECKINGS.APUS_STATS_PROCESS.PROCESS, _load('apus_statistics/main.lua')[0])
-    CHECKINGS.APUS_STATS_PROCESS.LOAD_LUA = 'OK'
-    fs.writeFileSync('tmp/deploy_progress.yml', yaml.dump(CHECKINGS))
+  if (ConfigWithoutT0Allocation.APUS_STATS_PROCESS.DeployProgress.LOAD_LUA != 'OK') {
+    console.log("START APUS_STATS_PROCESS LOAD_LUA.")
+    await _sendMessageAndGetResult(ConfigWithoutT0Allocation.APUS_STATS_PROCESS.Process.ID, _load('apus_statistics/main.lua')[0])
+    ConfigWithoutT0Allocation.APUS_STATS_PROCESS.DeployProgress.LOAD_LUA = 'OK'
+    fs.writeFileSync('deploy/config.yml', yaml.dump(ConfigWithoutT0Allocation))
     console.log("PASS APUS_STATS_PROCESS LOAD_LUA.")
   } else {
     console.log("SKIP APUS_STATS_PROCESS LOAD_LUA.")
   }
-  if (CHECKINGS.APUS_STATS_PROCESS.MONITOR != 'OK') {
-    await _sendMonitorCommand(CHECKINGS.APUS_STATS_PROCESS.PROCESS)
-    CHECKINGS.APUS_STATS_PROCESS.MONITOR = 'OK'
-    fs.writeFileSync('tmp/deploy_progress.yml', yaml.dump(CHECKINGS))
+  if (ConfigWithoutT0Allocation.APUS_STATS_PROCESS.DeployProgress.MONITOR != 'OK') {
+    console.log("START APUS_STATS_PROCESS MONITOR.")
+    await _sendMonitorCommand(ConfigWithoutT0Allocation.APUS_STATS_PROCESS.Process.ID)
+    ConfigWithoutT0Allocation.APUS_STATS_PROCESS.DeployProgress.MONITOR = 'OK'
+    fs.writeFileSync('deploy/config.yml', yaml.dump(ConfigWithoutT0Allocation))
     console.log("PASS APUS_STATS_PROCESS MONITOR.")
   } else {
     console.log("SKIP APUS_STATS_PROCESS MONITOR.")
@@ -342,36 +455,29 @@ function delay(ms) {
 }
 
 (async function main() {
-  if (!fs.existsSync('tmp/')) {
-    fs.mkdirSync('tmp/')
-  }
-  if (!fs.existsSync('tmp/deploy_progress.yml', 'utf-8')) {
-    fs.writeFileSync('tmp/deploy_progress.yml', yaml.dump({
-      APUS_TOKEN_PROCESS: {
-        NAME: null,
-        PROCESS: null,
-        DEPLOY: 'PENDING',
-        LOAD_LUA: 'PENDING',
-        MONITOR: 'PENDING',
-        INITIALIZE: 'PENDING'
-      },
-      APUS_STATS_PROCESS: {
-        NAME: null,
-        PROCESS: null,
-        DEPLOY: 'PENDING',
-        LOAD_LUA: 'PENDING',
-        MONITOR: 'PENDING',
-        INITIALIZE: 'PENDING'
-      }
-    }))
-  }
-  CHECKINGS = yaml.load(fs.readFileSync('tmp/deploy_progress.yml', "utf-8"))
-  let res = await preparationCheck()
-  if (res) {
-    console.log(`Preparation Check Failed: ${res}`)
+  if ((process.argv?.[2] || "") == "clear") {
+    if (fs.existsSync('deploy/config.yml')) {
+      fs.rmSync('deploy/config.yml');
+    }
     return
   }
 
-  await deployProcess()
-  await initializeProcess()
+  // substract process_name from source codes.
+  const prepareConfigRes = await prepareConfig()
+  if (prepareConfigRes) {
+    console.log(prepareConfigRes)
+    return
+  }
+
+  const preparationCheckRes = await preparationCheck()
+  if (preparationCheckRes) {
+    console.log(preparationCheckRes)
+    return
+  }
+
+  const deployRes = await deployProcess()
+  if (deployRes) {
+    console.log(deployRes)
+    return
+  }
 })()

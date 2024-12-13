@@ -128,7 +128,7 @@ Initialized = Initialized or false
   local sum = Utils.reduce(function(acc, value)
     return BintUtils.add(acc, value.Amount)
   end, "0", T0_ALLOCATION)
-  assert(sum == INITIAL_MINT_AMOUNT)
+  assert(sum == INITIAL_MINT_AMOUNT, "Initiali Mint Amount Not Equal to 80000000000000000000")
 
   -- set balance for each user
   Utils.map(function(r)

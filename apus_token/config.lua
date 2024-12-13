@@ -10,7 +10,9 @@ Name = "Apus"
 Ticker = "Apus"
 Logo = "SBCCXwwecBlDqRLUjb8dYABExTJXLieawf7m2aBJ-KY"
 
--- T0 token receivers
+-- Current minting mode ("ON" or "OFF"), ON: auto-mint; OFF: manual-mint
+MODE = MODE or "ON"
+--T0 token receivers
 T0_ALLOCATION = {
   -- 1% to liquidity
   { Author = "Liquidity_Address",      Amount = "10000000000000000000" },
