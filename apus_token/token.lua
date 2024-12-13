@@ -26,13 +26,9 @@ Variant = "0.0.3"
 -- token should be idempotent and not change previous state updates
 Denomination = Denomination or 12
 -- Initial balance for the process
-Balances = Balances or { [ao.id] = "80000000000000000000" }
+Balances = Balances or {}
 -- Total supply of tokens: 1_000_000_000 Apus Tokens; 1_000_000_000_000_000_000 with denomination
 TotalSupply = "1000000000000000000000"
-Name = "Apus"
-Ticker = "Apus"
--- @TODO: Logo
-Logo = Logo or "SBCCXwwecBlDqRLUjb8dYABExTJXLieawf7m2aBJ-KY"
 -- Flag indicating if transfer is enabled
 IsTNComing = IsTNComing or false
 
