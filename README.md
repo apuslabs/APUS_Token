@@ -99,14 +99,23 @@ luaunit.LuaUnit.run()
 
 # How to deploy
 
-Run with aos console:
+Create Apus Statstics Process and get the process id:
 ```
-aos [process_name] --sqlite --cron 5-minute
-
-.load apus_token/main.lua
-
+aos [apus_statistic_process] --cron 5-minute
 .monitor
+.load apus_statistics/main.lua
+APUS_MINT_PROCESS = "[your_apus_mint_process_id]"
 ```
+
+Create Apus Token
+```
+aos [apus_token_process] --cron 5-minute --sqlite
+.monitor
+.load apus_token/main.lua
+APUS_STATS_PROCESS = "[your_apus_statistic_process_id]"
+```
+
+
 
 # AOS console inputs & outputs
 
