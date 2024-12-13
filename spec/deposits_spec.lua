@@ -2,9 +2,6 @@ local luaunit = require('libs.luaunit')
 luaunit.LuaUnit:setOutputType("tap")
 luaunit:setVerbosity(luaunit.VERBOSITY_VERBOSE)
 
-local Utils = require('utils')
-local BintUtils = require('utils.bint_utils')
-local bint = require('.bint')(256)
 TestDeposits = {}
 
 Deposits = nil

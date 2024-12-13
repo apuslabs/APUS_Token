@@ -1,29 +1,29 @@
 -- Initialization Script for Minting and Handlers
 
 -- Import necessary modules
-local sqlite3 = require('lsqlite3')
-local json = require('json')
-local Utils = require('.utils')
-local BintUtils = require('utils.bint_utils')
+local sqlite3         = require('lsqlite3')
+local json            = require('json')
+local Utils           = require('.utils')
+local BintUtils       = require('utils.bint_utils')
 local EthAddressUtils = require('utils.eth_address')
 
 -- Constants
-INITIAL_CAPITAL = "80000000000000000000" -- 80,000,000 tokens with denomination
+INITIAL_MINT_AMOUNT   = "80000000000000000000" -- 80,000,000 tokens with denomination
 
 -- Initialize in-memory SQLite database or reuse existing one
-MintDb = MintDb or sqlite3.open_memory()
+MintDb                = MintDb or sqlite3.open_memory()
 
 -- Initialize Database Admin with MintDb
-DbAdmin = DbAdmin or require('utils.db_admin').new(MintDb)
+DbAdmin               = DbAdmin or require('utils.db_admin').new(MintDb)
 
 -- Initialize Data Access Layer for Deposits
-Deposits = require('dal.deposits').new(DbAdmin)
+Deposits              = require('dal.deposits').new(DbAdmin)
 
 -- Import core modules
-Mint = require("mint")
-Token = require('token')
-Allocator = require('allocator')
-Distributor = require('distributor')
+Mint                  = require("mint")
+Token                 = require('token')
+Allocator             = require('allocator')
+Distributor           = require('distributor')
 
 require('config')
 
@@ -128,7 +128,7 @@ Initialized = Initialized or false
   local sum = Utils.reduce(function(acc, value)
     return BintUtils.add(acc, value.Amount)
   end, "0", T0_ALLOCATION)
-  assert(sum == INITIAL_CAPITAL)
+  assert(sum == INITIAL_MINT_AMOUNT)
 
   -- set balance for each user
   Utils.map(function(r)
