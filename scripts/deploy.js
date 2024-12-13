@@ -4,7 +4,6 @@ import path from 'path'
 import yaml from 'js-yaml';
 import { connect, createDataItemSigner } from "@permaweb/aoconnect"
 import os from 'os';
-import { Config } from '@alicloud/openapi-client';
 
 const _arweave = Arweave.init()
 
