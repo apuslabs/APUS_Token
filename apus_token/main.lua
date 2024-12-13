@@ -7,6 +7,9 @@ local Utils = require('.utils')
 local BintUtils = require('utils.bint_utils')
 local EthAddressUtils = require('utils.eth_address')
 
+-- Constants
+INITIAL_CAPITAL = "80000000000000000000" -- 80,000,000 tokens with denomination
+
 -- Initialize in-memory SQLite database or reuse existing one
 MintDb = MintDb or sqlite3.open_memory()
 
@@ -125,7 +128,7 @@ Initialized = Initialized or false
   local sum = Utils.reduce(function(acc, value)
     return BintUtils.add(acc, value.Amount)
   end, "0", T0_ALLOCATION)
-  assert(sum == "80000000000000000000")
+  assert(sum == INITIAL_CAPITAL)
 
   -- set balance for each user
   Utils.map(function(r)
