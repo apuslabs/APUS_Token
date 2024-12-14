@@ -6,7 +6,7 @@ local json = require('json')
 APUS_MINT_PROCESS = APUS_MINT_PROCESS or "YB6KR9AdVCiOOJFRyHSBFxkgyMD-WOaN0AC6LTQ1MMQ"
 
 CycleInfo = CycleInfo or {}
-Capacity = Capacity or 288 -- 12 * 24 = 288, 288 cycles for one day
+Capacity = Capacity or 1 -- 12 * 24 = 288, 288 cycles for one day
 
 TotalMint = TotalMint or "0"
 AssetStaking = AssetStaking or {}
