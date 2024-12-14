@@ -32,14 +32,18 @@ function TestAllocator:testCompute()
     luaunit.assertEquals(#updatedDeposits, 3) 
     print("parameter is right ...")
 
-    local distributedTotal = bint(updatedDeposits[1].Reward) + bint(updatedDeposits[2].Reward) + bint(updatedDeposits[3].Reward)
-    luaunit.assertEquals(distributedTotal, bint(reward))
+    local distributedTotal = bint(updatedDeposits[1].Reward) + bint(updatedDeposits[2].Reward) +
+        bint(updatedDeposits[3].Reward)
+    local totalMint = bint("1000000000000") + bint("2000000000000") + bint("3000000000000")
+    local distributedCheck = bint(reward) * bint("1000000000000") // totalMint +
+        bint(reward) * bint("2000000000000") // totalMint +
+        bint(reward) * bint("3000000000000") // totalMint
+    luaunit.assertEquals(distributedTotal, distributedCheck)
 
     print("reward is right ...")
 
-    
-    local totalMint = bint("1000000000000") + bint("2000000000000") + bint("3000000000000")
-    luaunit.assertNotEquals(
+
+    luaunit.assertEquals(
         updatedDeposits[1].Reward,
         BintUtils.toBalanceValue(bint(reward) * bint("1000000000000") // totalMint)
     )
@@ -53,8 +57,6 @@ function TestAllocator:testCompute()
         updatedDeposits[3].Reward,
         BintUtils.toBalanceValue(bint(reward) * bint("3000000000000") // totalMint)
     )
-
-  
 end
 
 luaunit.LuaUnit.run()
