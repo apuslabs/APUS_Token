@@ -5,6 +5,7 @@ luaunit:setVerbosity(luaunit.VERBOSITY_VERBOSE)
 
 local BintUtils = require('utils.bint_utils')
 local bint = require('.bint')(256)
+local Utils = require('.utils')
 TestMintNormal = {}
 
 Mint = nil
@@ -460,6 +461,62 @@ function TestMintNormal:test_07_Mode()
     local ret = Mint.mint({ Timestamp = 300000, Action = "Cron" })
     luaunit.assertEquals(MintedSupply, beforeSupply)
     luaunit.assertEquals(ret, "Not Minting by CRON untils MODE is set to ON")
+end
+
+function TestMintNormal:test_08_incompleteAllocation()
+    local mintReportList = {}
+
+    table.insert(mintReportList, {
+        Mint = "403089428078",
+        User = "0x6DCeB0F7Dd6bED4fF190D8cA74F67973C280f4B4",
+        Recipient = "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+        Amount = "180000000000000000000",
+        ReportTo = ao.id,
+        Token = "stETH"
+    })
+
+    table.insert(mintReportList, {
+        Mint = "353089428078",
+        User = "0xdA4Ef9B6d55176ab0760b8fe90152c699C91D16e",
+        Recipient = "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+        Amount = "180000000000000000000",
+        ReportTo = ao.id,
+        Token = "stETH"
+    })
+    table.insert(mintReportList, {
+        Mint = "773089428078",
+        User = "0x360d26B78eECB0DC96c3fC4d99512879916b35c4",
+        Recipient = "8Dty73vZSUPPRgnFtRgCa4Qa_55gOKef-PFnb57F_FQ",
+        Amount = "180000000000000000000",
+        ReportTo = ao.id,
+        Token = "stETH"
+    })
+    Mint.batchUpdate(mintReportList)
+
+    Deposits.dbAdmin:apply([[Update Rewards set Recipient = ? where User = ?]],
+        { "FAKE_AR_ADDRESS_1", "0x6DCeB0F7Dd6bED4fF190D8cA74F67973C280f4B4" })
+
+    Deposits.dbAdmin:apply([[Update Rewards set Recipient = ? where User = ?]],
+        { "FAKE_AR_ADDRESS_1", "0xdA4Ef9B6d55176ab0760b8fe90152c699C91D16e" })
+
+    Deposits.dbAdmin:apply([[Update Rewards set Recipient = ? where User = ?]],
+        { "FAKE_AR_ADDRESS_1", "0x360d26B78eECB0DC96c3fC4d99512879916b35c4" })
+
+    local releaseAmount = Mint.currentMintAmount()
+    local beforeSupply = MintedSupply
+
+    MODE = "ON"
+
+    local ret = Mint.mint({ Timestamp = 300000, Action = "Cron" })
+    local afterSupply = MintedSupply
+
+    local totalMint = Utils.reduce(function(acc, value)
+        return BintUtils.add(acc, value.Mint)
+    end, "0", mintReportList)
+    local supposedMinted = Utils.reduce(function(acc, value)
+        return BintUtils.add(acc, BintUtils.toBalanceValue(bint(releaseAmount) * bint(value.Mint) // bint(totalMint)))
+    end, "0", mintReportList)
+    luaunit.assertEquals(BintUtils.subtract(afterSupply, beforeSupply), supposedMinted)
 end
 
 luaunit.LuaUnit.run()
