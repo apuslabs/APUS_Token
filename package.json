@@ -5,7 +5,11 @@
     "arweave": "^1.15.5",
     "dayjs": "^1.11.13",
     "fs-extra": "^11.2.0",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "yargs": "^17.7.2"
+  },
+  "bin": {
+    "helper": "./scripts/cmd.js"
   },
   "name": "apus_token",
   "type": "module",
