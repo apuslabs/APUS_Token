@@ -1,8 +1,11 @@
 {
   "dependencies": {
+    "@dha-team/arbundles": "^1.0.1",
     "@permaweb/ao-loader": "^0.0.43",
     "@permaweb/aoconnect": "^0.0.62",
     "arweave": "^1.15.5",
+    "axios": "^1.7.9",
+    "big.js": "^6.2.2",
     "dayjs": "^1.11.13",
     "fs-extra": "^11.2.0",
     "js-yaml": "^4.1.0",
@@ -18,7 +21,8 @@
   "main": "index.js",
   "scripts": {
     "init": "git submodule update --init --recursive && cd vendor/aos && npm install && cd ../..",
-    "test": "node --experimental-wasm-memory64 spec/test.js"
+    "test": "node --experimental-wasm-memory64 spec/test.js",
+    "helper": "node scripts/cmd.js"
   },
   "keywords": [],
   "author": "",

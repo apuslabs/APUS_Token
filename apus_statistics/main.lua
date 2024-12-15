@@ -101,6 +101,11 @@ Handlers.add("Cron", "Cron", function(msg)
   }).onReply(function(replyMsg)
     MintedSupply = replyMsg.Data
   end)
+
+  Send({
+    Target = APUS_MINT_PROCESS,
+    Action = "Mint.Mint"
+  })
 end)
 
 Handlers.add("Report.Mint", isMintReportFromAPUSToken, function(msg)
