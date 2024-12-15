@@ -837,7 +837,7 @@ async function showResult() {
   simpleSuccess(`Complete!\n`)
   console.log(`Apus Token Process:\t${_readRuntime().APUS_TOKEN_PROCESS_ID}`)
   console.log(`Apus Stats Process:\t${_readRuntime().APUS_STATS_PROCESS_ID}`)
-  console.log(`Test link:\thttps://test.apus.network/#/mint?apus_process=${_readRuntime().APUS_TOKEN_PROCESS_ID}}&mirror_process=${_readRuntime().APUS_STATS_PROCESS_ID}w&tge_time=2024-12-13T08:00:00Z`)
+  console.log(`Test link:\thttps://test.apus.network/#/mint?apus_process=${_readRuntime().APUS_TOKEN_PROCESS_ID}&mirror_process=${_readRuntime().APUS_STATS_PROCESS_ID}&tge_time=2024-12-13T08:00:00Z`)
 }
 
 export default async function deploy(argv) {
