@@ -4,6 +4,9 @@ import { hideBin } from 'yargs/helpers';
 import createConfig from './sub/create_config.mjs';
 import chalk from 'chalk';
 import deploy from './sub/deploy.mjs';
+import subscribe from './sub/subscribe.mjs';
+import { testAllocation } from './sub/test_allocation.mjs';
+import generateTestAddresses from './sub/generate_ether_accounts.mjs';
 
 
 const cmd = yargs(hideBin(process.argv));
@@ -91,11 +94,67 @@ const deployCommand = {
   },
 }
 
+const subscribeCommand = {
+  command: "subscribe",
+  describe: "subscribe AO mint report with the target key file.",
+  builder: (yargs) => {
+    yargs
+      .option('keyFile', {
+        describe: 'The location of key file',
+        type: 'string',
+        demandOption: true
+      })
+      .option('reportTo', {
+        describe: 'Which address the report is sent to',
+        type: 'string',
+        demandOption: true
+      })
+      .option('env', {
+        description: 'production or test',
+        type: 'string',
+        default: "test"
+      })
+  },
+  handler: (argv) => {
+    subscribe(argv)
+  },
+}
+
+const testAllocationCommand = {
+  command: "test_allocation",
+  describe: "Only in test environment, use prepared 5 ethereum accounts do allocation for target address",
+  builder: (yargs) => {
+    yargs
+      .option('target', {
+        describe: 'The target address of allocation',
+        type: 'string',
+        demandOption: true
+      })
+  },
+  handler: (argv) => {
+    testAllocation(argv)
+  },
+}
+
+const generateEtherAccountsCommand = {
+  command: "generate_ethers_accounts",
+  describe: "generate ethereum accounts for test",
+  builder: (yargs) => { },
+  handler: (argv) => {
+    const res = generateTestAddresses(10);
+    console.log(res.map(r => r.privateKey.slice(2)))
+  }
+}
+
+
 // 定义子命令
 cmd
-  .scriptName('npx helper')
+  .scriptName('npm run helper')
   .command(create_config)
   .command(deployCommand)
+  .command(subscribeCommand)
+  .command(testAllocationCommand)
+  .command(generateEtherAccountsCommand)
   .demandCommand(1, chalk.red('You must provide at least one command.')) // 必须输入命令
   .fail((msg, err, yargs) => {
     if (err) {

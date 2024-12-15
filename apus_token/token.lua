@@ -89,6 +89,18 @@ Token.balance = function(msg)
 end
 
 --[[
+     Balances
+   ]]
+--
+Token.balances = function(msg)
+    if msg.reply then
+        msg.reply({ Data = json.encode(Balances) })
+    else
+        Send({ Target = msg.From, Data = json.encode(Balances) })
+    end
+end
+
+--[[
     Handler: Transfer
     Transfers tokens from one user to another
     Note: Currently disabled until TN (Liquidity Trigger Event) is implemented
@@ -175,7 +187,7 @@ end
 --[[
     Handler: Total Supply
     Returns the total supply of tokens
-]]--
+]] --
 Token.totalSupply = function(msg)
     -- Prevent self-calls to avoid potential infinite loops or conflicts
     assert(msg.From ~= ao.id, "Cannot call Total-Supply from the same process!")

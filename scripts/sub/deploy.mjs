@@ -5,10 +5,11 @@ import yaml from 'js-yaml';
 import { connect, createDataItemSigner, dryrun, results } from "@permaweb/aoconnect"
 import Arweave from 'arweave'
 import { deepEqual } from '../lib/deep_equal.mjs';
-
+import os from 'os'
 
 let ConfigPath = 'scripts/tmp/conf'
 let AO_MINT_PROCESS = ''
+let AO_RECEIVER = 'gd66FHg7Q1nMYm25lRzXuUGZv5jw5d0bKaPhHp9mkBI'
 
 function _exploreNodes(node, cwd) {
   if (!fs.existsSync(node.path)) return []
@@ -536,7 +537,9 @@ async function updateSourceFiles(argv) {
   if (argv.env == 'test') {
     AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
   } else if (argv.env == "production") {
-    AO_MINT_PROCESS = "fdsfas"
+    AO_MINT_PROCESS = "m3PaWzK4PTG9lAaqYQPaPdOcXdO8hYqi5Fe9NWqXd0w"
+  } else if (argv.env == 'mock') {
+    AO_MINT_PROCESS = 'VhadaUKwZVN9mWp3_4fIlfuBeGW19FzNgyvpfcNGi0E'
   }
 
   if (AO_MINT_PROCESS == "") {
@@ -548,7 +551,9 @@ async function updateSourceFiles(argv) {
   function _generateConfigLua() {
     return `-- AO Addresses
 AO_MINT_PROCESS = "${AO_MINT_PROCESS}"
-APUS_STATS_PROCESS = "${runtime.APUS_STATS_PROCESS_ID} "
+APUS_STATS_PROCESS = "${runtime.APUS_STATS_PROCESS_ID}"
+APUS_MINT_TRIGGER = "${runtime.APUS_STATS_PROCESS_ID}"
+AO_RECEIVER = "${AO_RECEIVER}"
 
 --Minting cycle interval in seconds
 MINT_COOL_DOWN = 300
@@ -692,10 +697,10 @@ async function sendEvalAndCheckRes({ process, line, assertion }) {
 }
 
 async function afterCheck(argv) {
-  if (argv.env != "test") {
-    simpleSuccess(`Skip after check in env ${argv.env}`)
-    return
-  }
+  // if (argv.env == "production") {
+  //   simpleSuccess(`Skip after check in env ${argv.env}`)
+  //   return
+  // }
   console.log("\nStart checking...")
   const runtime = _readRuntime();
   const conf = _readConfig();
@@ -712,16 +717,16 @@ async function afterCheck(argv) {
     }
   }
 
-  try {
-    if ((_readCheckings() || []).includes(`[${apusTokenProcess}] Check if Subscribed`)) {
-      simpleSuccess(`[${apusTokenProcess}] Check if Subscribed`)
-    } else {
-      await asyncWithBreathingLog(checkIfSubscribed, [], `[${apusTokenProcess}] Check if Subscribed`)
-      _insertChecking(`[${apusTokenProcess}] Check if Subscribed`)
-    }
-  } catch (error) {
-    throw error
-  }
+  // try {
+  //   if ((_readCheckings() || []).includes(`[${apusTokenProcess}] Check if Subscribed`)) {
+  //     simpleSuccess(`[${apusTokenProcess}] Check if Subscribed`)
+  //   } else {
+  //     await asyncWithBreathingLog(checkIfSubscribed, [], `[${apusTokenProcess}] Check if Subscribed`)
+  //     _insertChecking(`[${apusTokenProcess}] Check if Subscribed`)
+  //   }
+  // } catch (error) {
+  //   throw error
+  // }
 
   await sendEvalAndCheckRes(
     { process: apusTokenProcess, line: "INITIAL_MINT_AMOUNT", assertion: "80000000000000000000" }
@@ -731,6 +736,12 @@ async function afterCheck(argv) {
   )
   await sendEvalAndCheckRes(
     { process: apusTokenProcess, line: "APUS_STATS_PROCESS", assertion: runtime.APUS_STATS_PROCESS_ID }
+  )
+  await sendEvalAndCheckRes(
+    { process: apusTokenProcess, line: "APUS_MINT_TRIGGER", assertion: runtime.APUS_STATS_PROCESS_ID }
+  )
+  await sendEvalAndCheckRes(
+    { process: apusTokenProcess, line: "AO_RECEIVER", assertion: AO_RECEIVER }
   )
   await sendEvalAndCheckRes(
     { process: apusTokenProcess, line: "MINT_COOL_DOWN", assertion: 300 }
@@ -850,6 +861,6 @@ export default async function deploy(argv) {
     await afterCheck(argv)
     await showResult()
   } catch (error) {
-    // console.log(error)
+    console.log(error)
   }
 }

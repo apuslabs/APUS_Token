@@ -32,11 +32,15 @@ local function isMintReportFromAOMint(msg)
   return msg.Action == "Report.Mint" and msg.From == AO_MINT_PROCESS
 end
 
+local function isMintTrigger(msg)
+  return msg.Action == "Mint.Mint" and msg.From == APUS_MINT_TRIGGER
+end
+
 -- Handler for AO Mint Report
 Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   -- Filter reports where the recipient matches the current process ID
   local reports = Utils.filter(function(r)
-    return r.Recipient == ao.id
+    return r.Recipient == AO_RECEIVER
   end, msg.Data)
   -- Update message data with filtered reports and forward to APUS_STATS_PROCESS
   msg.Data = reports
@@ -60,7 +64,7 @@ Handlers.add("AO-Mint-Report-test", "Report.Mint", function(msg)
 end)
 
 -- Cron job handler to trigger minting process (MODE = "ON")
-Handlers.add("Cron", "Cron", Mint.mint)
+Handlers.add("Mint.Mint", isMintTrigger, Mint.mint)
 
 -- Handler for Mint Backup process (MODE = "OFF")
 Handlers.add("Mint.Backup", "Mint.Backup", Mint.mintBackUp)
@@ -121,8 +125,6 @@ Initialized = Initialized or false
     return
   end
   print("Initializing ...")
-  -- Subscribe Mint Report From AO Mint Process
-  Send({ Target = AO_MINT_PROCESS, Action = "Recipient.Subscribe-Report", ["Report-To"] = ao.id })
 
   -- check if the sum is 8% of the total supply
   local sum = Utils.reduce(function(acc, value)

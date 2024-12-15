@@ -3,7 +3,7 @@ local bintUtils = require('utils.bint_utils')
 local bint = require('.bint')(256)
 local json = require('json')
 
-APUS_MINT_PROCESS = APUS_MINT_PROCESS or "YB6KR9AdVCiOOJFRyHSBFxkgyMD-WOaN0AC6LTQ1MMQ"
+APUS_MINT_PROCESS = APUS_MINT_PROCESS or "wvVpl-Tg8j15lfD5VrrhyWRR1AQnoFaMMrfgMYES1jU"
 
 CycleInfo = CycleInfo or {}
 Capacity = Capacity or 1 -- Take the average level of the past 1 cycle(s).
@@ -101,6 +101,11 @@ Handlers.add("Cron", "Cron", function(msg)
   }).onReply(function(replyMsg)
     MintedSupply = replyMsg.Data
   end)
+
+  Send({
+    Target = APUS_MINT_PROCESS,
+    Action = "Mint.Mint"
+  })
 end)
 
 Handlers.add("Report.Mint", isMintReportFromAPUSToken, function(msg)
