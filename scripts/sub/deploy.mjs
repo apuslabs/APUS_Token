@@ -354,9 +354,9 @@ function _updateApusStatsProcessAndName(process, name) {
 }
 
 async function prepareConfig(argv) {
-  const defaultT0Allocation = `- Author: Liquidity_Address
+  const defaultT0Allocation = `- Author: zxom15ySOXLhpasi8ian4eoKmocUpNpi5BHE1g0Uqas
   Amount: "10000000000000000000"
-- Author: Pool_Bootstrap_Address
+- Author: POJfk-XpD1ghZLIZwuSCD8JFDh_FPOZYbizp5MWxczQ
   Amount: "50000000000000000000"
 - Author: Contributor_1
   Amount: "1000000000000000000"
