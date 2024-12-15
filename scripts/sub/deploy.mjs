@@ -9,8 +9,7 @@ import os from 'os'
 
 let ConfigPath = 'scripts/tmp/conf'
 let AO_MINT_PROCESS = ''
-// let AO_RECEIVER = 'LWtuhySg6XPEenojALErsUWiAwzQEH5P4_EQVGtMsrs'
-let AO_RECEIVER = 'wU4TFTVHL8vNuw8tNgab6bimvOh1S-V4I1xkYEQTDFQ'
+let AO_RECEIVER = 'gd66FHg7Q1nMYm25lRzXuUGZv5jw5d0bKaPhHp9mkBI'
 
 function _exploreNodes(node, cwd) {
   if (!fs.existsSync(node.path)) return []
@@ -698,10 +697,10 @@ async function sendEvalAndCheckRes({ process, line, assertion }) {
 }
 
 async function afterCheck(argv) {
-  if (argv.env == "production") {
-    simpleSuccess(`Skip after check in env ${argv.env}`)
-    return
-  }
+  // if (argv.env == "production") {
+  //   simpleSuccess(`Skip after check in env ${argv.env}`)
+  //   return
+  // }
   console.log("\nStart checking...")
   const runtime = _readRuntime();
   const conf = _readConfig();
