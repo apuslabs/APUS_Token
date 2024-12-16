@@ -38,7 +38,7 @@ async function _sendMessageAndGetResult(process, data, tags) {
 async function sendSubscribeAndCheckRes(argv) {
   try {
     const res = await asyncWithBreathingLog(_sendMessageAndGetResult, [AO_MINT_PROCESS, "", [
-      { name: 'Action', value: "Recipient.Subscribe-Report" },
+      { name: 'Action', value: "Report.Subscribe" },
       { name: 'Report-To', value: argv.reportTo }
     ]], `Send subscribe message to ${AO_MINT_PROCESS}, report-to:${argv.reportTo}`)
     if (res.Error) {
