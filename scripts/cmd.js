@@ -7,6 +7,7 @@ import deploy from './sub/deploy.mjs';
 import subscribe from './sub/subscribe.mjs';
 import { testAllocation } from './sub/test_allocation.mjs';
 import generateTestAddresses from './sub/generate_ether_accounts.mjs';
+import allowMintReport from './sub/allow_mint_report.mjs';
 
 
 const cmd = yargs(hideBin(process.argv));
@@ -146,6 +147,15 @@ const generateEtherAccountsCommand = {
   }
 }
 
+const allowMintReportCommand = {
+  command: "allow_mint_report",
+  describe: "allow the process receiving mint reports ",
+  builder: (yargs) => { },
+  handler: (argv) => {
+    allowMintReport()
+  }
+}
+
 
 // 定义子命令
 cmd
@@ -155,6 +165,7 @@ cmd
   .command(subscribeCommand)
   .command(testAllocationCommand)
   .command(generateEtherAccountsCommand)
+  .command(allowMintReportCommand)
   .demandCommand(1, chalk.red('You must provide at least one command.')) // 必须输入命令
   .fail((msg, err, yargs) => {
     if (err) {

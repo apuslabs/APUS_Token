@@ -1,6 +1,8 @@
 -- AO Addresses
 AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
 APUS_STATS_PROCESS = "zmr4sqL_fQjjvHoUJDkT8eqCiLFEM3RV5M96Wd59ffU"
+APUS_MINT_TRIGGER = "zmr4sqL_fQjjvHoUJDkT8eqCiLFEM3RV5M96Wd59ffU"
+AO_RECEIVER = ao.id
 
 -- Minting cycle interval in seconds
 MINT_COOL_DOWN = 300
