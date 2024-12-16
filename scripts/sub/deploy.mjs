@@ -6,10 +6,13 @@ import { connect, createDataItemSigner, dryrun, results } from "@permaweb/aoconn
 import Arweave from 'arweave'
 import { deepEqual } from '../lib/deep_equal.mjs';
 import os from 'os'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 let ConfigPath = 'scripts/tmp/conf'
 let AO_MINT_PROCESS = ''
-let AO_RECEIVER = 'gd66FHg7Q1nMYm25lRzXuUGZv5jw5d0bKaPhHp9mkBI'
+let AO_RECEIVER = process.env.AO_RECEIVER || 'gd66FHg7Q1nMYm25lRzXuUGZv5jw5d0bKaPhHp9mkBI'
 
 function _exploreNodes(node, cwd) {
   if (!fs.existsSync(node.path)) return []
@@ -354,50 +357,14 @@ function _updateApusStatsProcessAndName(process, name) {
 }
 
 async function prepareConfig(argv) {
-  const defaultT0Allocation = `- Author: Liquidity_Address
+  const defaultT0Allocation = `- Author: zxom15ySOXLhpasi8ian4eoKmocUpNpi5BHE1g0Uqas
   Amount: "10000000000000000000"
-- Author: Pool_Bootstrap_Address
+- Author: POJfk-XpD1ghZLIZwuSCD8JFDh_FPOZYbizp5MWxczQ
   Amount: "50000000000000000000"
-- Author: Contributor_1
-  Amount: "1000000000000000000"
-- Author: Contributor_2
-  Amount: "1000000000000000000"
-- Author: Contributor_3
-  Amount: "1000000000000000000"
-- Author: Contributor_4
-  Amount: "1000000000000000000"
-- Author: Contributor_5
-  Amount: "1000000000000000000"
-- Author: Contributor_6
-  Amount: "1000000000000000000"
-- Author: Contributor_7
-  Amount: "1000000000000000000"
-- Author: Contributor_8
-  Amount: "1000000000000000000"
-- Author: Contributor_9
-  Amount: "1000000000000000000"
-- Author: Contributor_10
-  Amount: "1000000000000000000"
-- Author: Contributor_11
-  Amount: "1000000000000000000"
-- Author: Contributor_12
-  Amount: "1000000000000000000"
-- Author: Contributor_13
-  Amount: "1000000000000000000"
-- Author: Contributor_14
-  Amount: "1000000000000000000"
-- Author: Contributor_15
-  Amount: "1000000000000000000"
-- Author: Contributor_16
-  Amount: "1000000000000000000"
-- Author: Contributor_17
-  Amount: "1000000000000000000"
-- Author: Contributor_18
-  Amount: "1000000000000000000"
-- Author: Contributor_19
-  Amount: "1000000000000000000"
-- Author: Contributor_20
-  Amount: "1000000000000000000"`
+- Author: shUfg1ovwx0J-5y6A4HUOWJ485XHBZXoLe4vS2iOurU
+  Amount: "10000000000000000000"
+- Author: JyQiTvqKIXZczY57PWOnhELUBIIKc56xWAbcM2_MXrk
+  Amount: "10000000000000000000"`
 
   function _checkConfigPath(argv) {
     if (!fs.existsSync(ConfigPath) || !fs.statSync(ConfigPath).isDirectory()) {
@@ -441,6 +408,9 @@ async function prepareConfig(argv) {
       if (fs.existsSync(path.join(ConfigPath, "checkings.yml"))) {
         fs.rmSync(path.join(ConfigPath, "checkings.yml"))
       }
+      if (fs.existsSync(path.join(ConfigPath, "T0_allocation.yml"))) {
+        fs.rmSync(path.join(ConfigPath, "T0_allocation.yml"))
+      }
     }
   }
 
@@ -463,10 +433,10 @@ async function prepareConfig(argv) {
       if (!fs.existsSync(ConfigPath)) {
         fs.mkdirSync(ConfigPath, { recursive: true })
       }
+      await _cleanProgressIfProcessNameChanged(argv)
       await asyncWithBreathingLog(_checkConfigPath, [argv], `Check if config ${argv.config} exist`);
       await asyncWithBreathingLog(_createConfigIfNotExist, [argv], `Create config if not exist ${path.join(argv.config, "config.yml")}`)
       await asyncWithBreathingLog(_createT0AllocationIfNotExist, [argv], `Create t0 allocation if not exist ${path.join(argv.config, "T0_allocation.yml")}`)
-      await _cleanProgressIfProcessNameChanged(argv)
     } else {
       if (argv["_"].length == 1) {
         await asyncWithBreathingLog(_createConfigIfNotExist, [argv], `Create config if not exist ${path.join(ConfigPath, "config.yml")}`)
@@ -476,8 +446,8 @@ async function prepareConfig(argv) {
       } else {
         await asyncWithBreathingLog(_overwriteConfig, [argv], `Create the config.`)
       }
-      await asyncWithBreathingLog(_createT0AllocationIfNotExist, [argv], `Create t0 allocation if not exist ${path.join(ConfigPath, "T0_allocation.yml")}`)
       await _cleanProgressIfProcessNameChanged(argv)
+      await asyncWithBreathingLog(_createT0AllocationIfNotExist, [argv], `Create t0 allocation if not exist ${path.join(ConfigPath, "T0_allocation.yml")}`)
     }
   } catch (error) {
     throw error
@@ -537,7 +507,7 @@ async function updateSourceFiles(argv) {
   if (argv.env == 'test') {
     AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
   } else if (argv.env == "production") {
-    AO_MINT_PROCESS = "m3PaWzK4PTG9lAaqYQPaPdOcXdO8hYqi5Fe9NWqXd0w"
+    AO_MINT_PROCESS = "1OEAToQGhSKV76oa1MFIGZ9bYxCJoxpXqtksApDdcu8"
   } else if (argv.env == 'mock') {
     AO_MINT_PROCESS = 'VhadaUKwZVN9mWp3_4fIlfuBeGW19FzNgyvpfcNGi0E'
   }
@@ -810,7 +780,7 @@ async function afterCheck(argv) {
     { process: apusTokenProcess, line: "require('json').encode(T0_ALLOCATION)", assertion: _readT0Allocation() }
   )
   await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "require('json').encode(Balances)", assertion: { "Contributor_17": "1000000000000000000", "Contributor_6": "1000000000000000000", "Contributor_8": "1000000000000000000", "Contributor_9": "1000000000000000000", "Contributor_10": "1000000000000000000", "Contributor_20": "1000000000000000000", "Contributor_5": "1000000000000000000", "Contributor_11": "1000000000000000000", "Pool_Bootstrap_Address": "50000000000000000000", "Contributor_15": "1000000000000000000", "Contributor_1": "1000000000000000000", "Contributor_18": "1000000000000000000", "Contributor_19": "1000000000000000000", "Contributor_14": "1000000000000000000", "Contributor_16": "1000000000000000000", "Contributor_3": "1000000000000000000", "Contributor_2": "1000000000000000000", "Liquidity_Address": "10000000000000000000", "Contributor_7": "1000000000000000000", "Contributor_13": "1000000000000000000", "Contributor_4": "1000000000000000000", "Contributor_12": "1000000000000000000" } }
+    { process: apusTokenProcess, line: "require('json').encode(Balances)", assertion: _readT0Allocation().reduce(function (acc, v) { acc[v.Author] = v.Amount; return acc }, {}) }
   )
   await sendEvalAndCheckRes(
     { process: apusStatsProcess, line: "APUS_MINT_PROCESS", assertion: runtime.APUS_TOKEN_PROCESS_ID }

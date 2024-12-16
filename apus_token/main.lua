@@ -36,8 +36,13 @@ local function isMintTrigger(msg)
   return msg.Action == "Mint.Mint" and msg.From == APUS_MINT_TRIGGER
 end
 
+AllowMintReport = AllowMintReport or false
 -- Handler for AO Mint Report
 Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
+  if not AllowMintReport then
+    print("Not receive mint reports yet.")
+    return
+  end
   -- Filter reports where the recipient matches the current process ID
   local reports = Utils.filter(function(r)
     return r.Recipient == AO_RECEIVER
@@ -47,20 +52,6 @@ Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   msg.forward(APUS_STATS_PROCESS)
   -- Batch update the Mint records
   Mint.batchUpdate(reports)
-end)
-
--- Handler for testing AO Mint Reports
-Handlers.add("AO-Mint-Report-test", "Report.Mint", function(msg)
-  -- Decode JSON data from the message
-  local reports = json.decode(msg.Data)
-
-  -- Filter reports for the current process ID
-  local reportList = Utils.filter(function(r)
-    return r.Recipient == ao.id
-  end, reports)
-  -- print(reportList)
-  -- Batch update the Mint records with the filtered list
-  Mint.batchUpdate(reportList)
 end)
 
 -- Cron job handler to trigger minting process (MODE = "ON")
