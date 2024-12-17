@@ -89,6 +89,11 @@ const deployCommand = {
         type: 'string',
         default: "test"
       })
+      .option('allowMint', {
+        description: 'timestamp that the process will start to process with mint reports',
+        type: 'number',
+        demandOption: true,
+      })
   },
   handler: (argv) => {
     deploy(argv)
@@ -107,8 +112,7 @@ const subscribeCommand = {
       })
       .option('reportTo', {
         describe: 'Which address the report is sent to',
-        type: 'string',
-        demandOption: true
+        type: 'string'
       })
       .option('env', {
         description: 'production or test',

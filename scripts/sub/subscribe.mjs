@@ -8,6 +8,15 @@ let JWK = ''
 let WALLET = ''
 let AO_MINT_PROCESS = ''
 
+
+
+function _readRuntime() {
+  if (!fs.existsSync(path.join(ConfigPath, "runtime.yml"))) {
+    fs.writeFileSync(path.join(ConfigPath, "runtime.yml"), '')
+  }
+  return yaml.load(fs.readFileSync(path.join(ConfigPath, "runtime.yml"), 'utf-8'))
+}
+
 async function _getAOWallet(keyFile) {
   const _arweave = Arweave.init()
   const jwk = keyFile ? JSON.parse(fs.readFileSync(keyFile, 'utf-8')) : JWK
@@ -37,10 +46,11 @@ async function _sendMessageAndGetResult(process, data, tags) {
 
 async function sendSubscribeAndCheckRes(argv) {
   try {
+    const reportTo = argv.reportTo ?? _readRuntime().APUS_TOKEN_PROCESS_ID
     const res = await asyncWithBreathingLog(_sendMessageAndGetResult, [AO_MINT_PROCESS, "", [
       { name: 'Action', value: "Report.Subscribe" },
-      { name: 'Report-To', value: argv.reportTo }
-    ]], `Send subscribe message to ${AO_MINT_PROCESS}, report-to:${argv.reportTo}`)
+      { name: 'Report-To', value: reportTo }
+    ]], `Send subscribe message to ${AO_MINT_PROCESS}, report-to:${reportTo}`)
     if (res.Error) {
       throw Error('Message error')
     }

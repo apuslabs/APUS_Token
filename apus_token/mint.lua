@@ -100,9 +100,9 @@ Mint.mint = function(msg)
         end
 
         -- If the action is triggered by Cron and the mode is OFF, do not proceed with minting
-        if msg.Action == "Cron" and MODE == "OFF" then
-            print("Not Minting by CRON untils MODE is set to ON")
-            return "Not Minting by CRON untils MODE is set to ON"
+        if msg.Action == "Mint.Mint" and MODE == "OFF" then
+            print("Not Minting by APUS_MINT_TRIGGER untils MODE is set to ON")
+            return "Not Minting by APUS_MINT_TRIGGER untils MODE is set to ON"
         end
 
         -- Calculate how many times minting should occur based on the cooldown period
