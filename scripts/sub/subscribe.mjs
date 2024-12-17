@@ -1,13 +1,14 @@
 import fs from 'fs';
 import { asyncWithBreathingLog, simpleError, simpleSuccess } from '../lib/async_with_log.mjs';
 import Arweave from 'arweave';
-
+import path from 'path';
 import { connect, createDataItemSigner, dryrun, results } from "@permaweb/aoconnect"
+import yaml from 'js-yaml'
 
 let JWK = ''
 let WALLET = ''
 let AO_MINT_PROCESS = ''
-
+let ConfigPath = 'scripts/tmp/conf'
 
 
 function _readRuntime() {
@@ -54,6 +55,9 @@ async function sendSubscribeAndCheckRes(argv) {
     if (res.Error) {
       throw Error('Message error')
     }
+    if ((res?.Messages?.[0]?.Data ?? '') != `Successfully subscribed to ${(await _getAOWallet()).address}`) {
+      throw Error('Subscribe not successful')
+    }
   } catch (error) {
     throw error
   }
@@ -86,7 +90,7 @@ export default async function subscribe(argv) {
       simpleError(`Failed to set AO_MINT_PROCESS, please check env: ${argv.env}`)
       return
     } else {
-      simpleSuccess(`Set AO_MINT_PROCESS:${AO_MINT_PROCESS}`)
+      simpleSuccess(`Set AO_MINT_PROCESS: ${AO_MINT_PROCESS}`)
     }
 
     await sendSubscribeAndCheckRes(argv)
