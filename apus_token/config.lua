@@ -8,7 +8,7 @@ AO_RECEIVER = ao.id
 MINT_COOL_DOWN = 300
 
 -- The moment the process starts to process with mint reports
-StartMintTime = 0
+StartMintTime = StartMintTime or 0
 
 -- Tokenomics
 Name = "Apus"
