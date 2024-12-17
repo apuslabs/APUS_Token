@@ -842,7 +842,7 @@ export default async function deploy(argv) {
     await loadLua()
     await monitorProcesses()
     await afterCheck(argv)
-    await showResult()
+    await showResult(argv)
   } catch (error) {
     console.log(error)
   }

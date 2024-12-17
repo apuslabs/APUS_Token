@@ -114,8 +114,7 @@ const subscribeCommand = {
       })
       .option('reportTo', {
         describe: 'Which address the report is sent to',
-        type: 'string',
-        demandOption: true
+        type: 'string'
       })
       .option('env', {
         description: 'production or test',
