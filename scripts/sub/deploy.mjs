@@ -841,7 +841,7 @@ export default async function deploy(argv) {
     await updateSourceFiles(argv) // get env to set AO_MINT_PROCESS
     await loadLua()
     await monitorProcesses()
-    await afterCheck(argv)
+    // await afterCheck(argv)
     await showResult(argv)
   } catch (error) {
     console.log(error)
