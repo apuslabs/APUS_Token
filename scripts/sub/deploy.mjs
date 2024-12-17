@@ -531,7 +531,7 @@ AO_RECEIVER = "${AO_RECEIVER}"
 MINT_COOL_DOWN = 300
 
 -- The moment the process starts to process with mint reports
-StartMintTime = ${START_MINT_TIME}
+StartMintTime = StartMintTime or ${START_MINT_TIME}
 
 --Tokenomics
 Name = "${conf.APUS_TOKEN_NAME}"
