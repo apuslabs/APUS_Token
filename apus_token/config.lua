@@ -7,6 +7,9 @@ AO_RECEIVER = ao.id
 -- Minting cycle interval in seconds
 MINT_COOL_DOWN = 300
 
+-- The moment the process starts to process with mint reports
+StartMintTime = StartMintTime or 0
+
 -- Tokenomics
 Name = "Apus"
 Ticker = "Apus"

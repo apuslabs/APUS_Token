@@ -13,6 +13,7 @@ dotenv.config()
 let ConfigPath = 'scripts/tmp/conf'
 let AO_MINT_PROCESS = ''
 let AO_RECEIVER = process.env.AO_RECEIVER || 'gd66FHg7Q1nMYm25lRzXuUGZv5jw5d0bKaPhHp9mkBI'
+let START_MINT_TIME = 0
 
 function _exploreNodes(node, cwd) {
   if (!fs.existsSync(node.path)) return []
@@ -428,6 +429,7 @@ async function prepareConfig(argv) {
   }
 
   try {
+    START_MINT_TIME = argv.allowMint
     if (argv.config) {
       ConfigPath = argv.config
       if (!fs.existsSync(ConfigPath)) {
@@ -527,6 +529,9 @@ AO_RECEIVER = "${AO_RECEIVER}"
 
 --Minting cycle interval in seconds
 MINT_COOL_DOWN = 300
+
+-- The moment the process starts to process with mint reports
+StartMintTime = StartMintTime or ${START_MINT_TIME}
 
 --Tokenomics
 Name = "${conf.APUS_TOKEN_NAME}"
@@ -717,6 +722,9 @@ async function afterCheck(argv) {
     { process: apusTokenProcess, line: "MINT_COOL_DOWN", assertion: 300 }
   )
   await sendEvalAndCheckRes(
+    { process: apusTokenProcess, line: "StartMintTime", assertion: START_MINT_TIME }
+  )
+  await sendEvalAndCheckRes(
     { process: apusTokenProcess, line: "Name", assertion: conf.APUS_TOKEN_NAME }
   )
   await sendEvalAndCheckRes(
@@ -814,11 +822,16 @@ async function afterCheck(argv) {
   )
 }
 
-async function showResult() {
+async function showResult(argv) {
   simpleSuccess(`Complete!\n`)
   console.log(`Apus Token Process:\t${_readRuntime().APUS_TOKEN_PROCESS_ID}`)
   console.log(`Apus Stats Process:\t${_readRuntime().APUS_STATS_PROCESS_ID}`)
-  console.log(`Test link:\thttps://test.apus.network/#/mint?apus_process=${_readRuntime().APUS_TOKEN_PROCESS_ID}&mirror_process=${_readRuntime().APUS_STATS_PROCESS_ID}&tge_time=2024-12-13T08:00:00Z`)
+  console.log("\n\n")
+  console.log(`First, you can run script:\n\nnpm run helper -- subscribe --keyFile=[your_key_file] --env=${argv.env}\n\nto subscribe for the new process, it read from scripts/tmp/conf/runtime.yml by default.`)
+  console.log("\n\n")
+  console.log(`Go to page\nhttps://www.ao.link/#/token/${_readRuntime().APUS_TOKEN_PROCESS_ID}?tab=chart\ncheck name, logo, ticker and initial allocation.`)
+  console.log("\n\n")
+  console.log(`Entity page: https://www.ao.link/#/entity/${_readRuntime().APUS_TOKEN_PROCESS_ID}`)
 }
 
 export default async function deploy(argv) {
