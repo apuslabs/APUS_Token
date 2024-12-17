@@ -9,6 +9,7 @@ import { testAllocation } from './sub/test_allocation.mjs';
 import generateTestAddresses from './sub/generate_ether_accounts.mjs';
 import allowMintReport from './sub/allow_mint_report.mjs';
 import sendMessageToToken from './sub/send_message_to_token.mjs';
+import monitorProcess from './sub/monitor.mjs';
 
 
 const cmd = yargs(hideBin(process.argv));
@@ -113,7 +114,8 @@ const subscribeCommand = {
       })
       .option('reportTo', {
         describe: 'Which address the report is sent to',
-        type: 'string'
+        type: 'string',
+        demandOption: true
       })
       .option('env', {
         description: 'production or test',
@@ -165,7 +167,7 @@ const sendMessageToTokenCommand = {
   command: 'send_message_to_token <message>',
   describe: "send message to token.",
   builder: (yargs) => {
-    return yargs
+    yargs
       .positional('message', {
         describe: 'message sent to the process',
         type: 'string',
@@ -177,6 +179,20 @@ const sendMessageToTokenCommand = {
   }
 }
 
+const monitorCommand = {
+  command: 'monitor <process>',
+  describe: 'monitor the target process',
+  builder: (yargs) => {
+    yargs.positional('process', {
+      describe: 'process id',
+      type: 'string',
+      demandOption: false
+    })
+  },
+  handler: (argv) => {
+    monitorProcess(argv)
+  }
+}
 
 // 定义子命令
 cmd
@@ -188,6 +204,7 @@ cmd
   .command(generateEtherAccountsCommand)
   .command(allowMintReportCommand)
   .command(sendMessageToTokenCommand)
+  .command(monitorCommand)
   .demandCommand(1, chalk.red('You must provide at least one command.')) // 必须输入命令
   .fail((msg, err, yargs) => {
     if (err) {

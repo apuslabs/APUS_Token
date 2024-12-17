@@ -1,13 +1,14 @@
 import fs from 'fs';
 import { asyncWithBreathingLog, simpleError, simpleSuccess } from '../lib/async_with_log.mjs';
 import Arweave from 'arweave';
-
+import path from 'path';
 import { connect, createDataItemSigner, dryrun, results } from "@permaweb/aoconnect"
+import yaml from 'js-yaml'
 
 let JWK = ''
 let WALLET = ''
 let AO_MINT_PROCESS = ''
-
+let ConfigPath = 'scripts/tmp/conf'
 
 
 function _readRuntime() {
@@ -46,13 +47,15 @@ async function _sendMessageAndGetResult(process, data, tags) {
 
 async function sendSubscribeAndCheckRes(argv) {
   try {
-    const reportTo = argv.reportTo ?? _readRuntime().APUS_TOKEN_PROCESS_ID
     const res = await asyncWithBreathingLog(_sendMessageAndGetResult, [AO_MINT_PROCESS, "", [
       { name: 'Action', value: "Report.Subscribe" },
-      { name: 'Report-To', value: reportTo }
-    ]], `Send subscribe message to ${AO_MINT_PROCESS}, report-to:${reportTo}`)
+      { name: 'Report-To', value: argv.reportTo }
+    ]], `Send subscribe message to ${AO_MINT_PROCESS}, report-to:${argv.reportTo}`)
     if (res.Error) {
       throw Error('Message error')
+    }
+    if ((res?.Messages?.[0]?.Data ?? '') != `Successfully subscribed to ${(await _getAOWallet()).address}`) {
+      throw Error('Subscribe not successful')
     }
   } catch (error) {
     throw error
@@ -86,7 +89,7 @@ export default async function subscribe(argv) {
       simpleError(`Failed to set AO_MINT_PROCESS, please check env: ${argv.env}`)
       return
     } else {
-      simpleSuccess(`Set AO_MINT_PROCESS:${AO_MINT_PROCESS}`)
+      simpleSuccess(`Set AO_MINT_PROCESS: ${AO_MINT_PROCESS}`)
     }
 
     await sendSubscribeAndCheckRes(argv)
