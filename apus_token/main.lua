@@ -32,10 +32,6 @@ local function isMintReportFromAOMint(msg)
   return msg.Action == "Report.Mint" and msg.From == AO_MINT_PROCESS
 end
 
-local function isMintTrigger(msg)
-  return msg.Action == "Mint.Mint" and msg.From == APUS_MINT_TRIGGER
-end
-
 -- Handler for AO Mint Report
 Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   if msg.Timestamp // 1000 <= StartMintTime then
@@ -54,7 +50,7 @@ Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
 end)
 
 -- Cron job handler to trigger minting process (MODE = "ON")
-Handlers.add("Mint.Mint", isMintTrigger, Mint.mint)
+Handlers.add("Mint.Mint", "Cron", Mint.mint)
 
 -- Handler for Mint Backup process (MODE = "OFF")
 Handlers.add("Mint.Backup", "Mint.Backup", Mint.mintBackUp)
