@@ -196,12 +196,12 @@ Handlers.add("User.Get-Estimated-Apus-Token", "User.Get-Estimated-Apus-Token", f
         (bintUtils.add(predictedAOMinted, TotalMint))
 
     -- Calculate the predicted monthly reward based on remaining mint capacity
-    local predictedMontlyReward = bintUtils.toBalanceValue(bintUtils.toBalanceValue((bint(MintCapacity) -
+    local predictedMonthlyReward = bintUtils.toBalanceValue(bintUtils.toBalanceValue((bint(MintCapacity) -
       bint(MintedSupply)) * 17 // 1000))
 
     -- Calculate the final result based on the predicted AO minted and reward
     local res = bintUtils.toBalanceValue(
-      bint(predictedMontlyReward) * bint(predictedAOMinted) // (bint(predictedAOMinted) + bint(TotalMint)))
+      bint(predictedMonthlyReward) * bint(predictedAOMinted) // (bint(predictedAOMinted) + bint(TotalMint)))
     msg.reply({ Data = res }) -- Return the calculated result
   end)
   if err then
@@ -221,10 +221,10 @@ Handlers.add("User.Get-User-Estimated-Apus-Token", "User.Get-User-Estimated-Apus
     local totalShare = TotalMint
 
     -- Calculate the predicted monthly reward based on remaining mint capacity
-    local predictedMontlyReward = bintUtils.toBalanceValue(bint(bintUtils.subtract(MintCapacity,
+    local predictedMonthlyReward = bintUtils.toBalanceValue(bint(bintUtils.subtract(MintCapacity,
       MintedSupply)) * 17 // 1000)
     -- Calculate the estimated reward for the user based on their share
-    local res = bintUtils.toBalanceValue(bint(predictedMontlyReward) * bint(share) // bint(totalShare))
+    local res = bintUtils.toBalanceValue(bint(predictedMonthlyReward) * bint(share) // bint(totalShare))
 
     msg.reply({ Data = res }) -- Return the estimated result for the user
   end)
