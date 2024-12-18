@@ -38,7 +38,6 @@ T0_ALLOCATION = {
   { Author = "POJfk-XpD1ghZLIZwuSCD8JFDh_FPOZYbizp5MWxczQ", Amount = "50000000000000000000" },
 
   -- 2% allocated to contributors
-  -- List of contributors and their respective allocations (dynamically generated)
   -- Now test only. Will add all winners' awards during test period before TGE
   { Author = "shUfg1ovwx0J-5y6A4HUOWJ485XHBZXoLe4vS2iOurU", Amount = "10000000000000000000" },
   { Author = "JyQiTvqKIXZczY57PWOnhELUBIIKc56xWAbcM2_MXrk", Amount = "10000000000000000000" }
