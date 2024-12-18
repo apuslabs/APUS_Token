@@ -41,7 +41,8 @@ end
 -- Handler for AO Mint Report
 Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   if msg.Timestamp // 1000 <= StartMintTime then
-    Logger.error("Not receiving messages until " .. os.date("%Y-%m-%d %H:%M:%S", StartMintTime) .. "(UTC)")
+    Logger.info(
+      "Mint Reports received but not processed (before " .. os.date("%Y-%m-%d %H:%M:%S(UTC)", StartMintTime) .. ").")
     return
   end
   -- Filter reports where the recipient matches the current process ID

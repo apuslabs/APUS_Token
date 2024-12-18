@@ -1,54 +1,46 @@
--- AO Addresses
+-- [[
+--   AO Addresses
+-- ]]
+-- Mint process address used for minting operations (dynamically set)
 AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
-APUS_STATS_PROCESS = "zmr4sqL_fQjjvHoUJDkT8eqCiLFEM3RV5M96Wd59ffU"
-APUS_MINT_TRIGGER = "zmr4sqL_fQjjvHoUJDkT8eqCiLFEM3RV5M96Wd59ffU"
-AO_RECEIVER = ao.id
+-- APUS stats process address used for tracking statistics (dynamically set from runtime config)
+APUS_STATS_PROCESS = "hEBzo6Up125OBeCKoz3W12y2CbQESl0Q4xoWkceDR00"
+-- The receiver address for the AO process, typically refers to the AO instance ID (dynamically set)
+AO_RECEIVER = "wU4TFTVHL8vNuw8tNgab6bimvOh1S-V4I1xkYEQTDFQ"
 
--- Minting cycle interval in seconds
+-- Minting cycle interval (in seconds)
+-- Defines the cooldown period between minting cycles, set to 300 seconds (5 minutes)
 MINT_COOL_DOWN = 300
 
--- The moment the process starts to process with mint reports
-StartMintTime = StartMintTime or 0
+-- Start time for mint processing (initially set to a dynamic value if not defined)
+-- Marks the moment when minting process begins
+StartMintTime = StartMintTime or 1734513300
 
--- Log levels: trace, debug, info, warn, error, fatal
+-- Log levels to control verbosity of logs
+-- Valid log levels: trace, debug, info, warn, error, fatal (default is 'info')
 LogLevel = LogLevel or 'info'
 
 -- Tokenomics
 Name = "Apus"
 Ticker = "Apus"
-Logo = "SBCCXwwecBlDqRLUjb8dYABExTJXLieawf7m2aBJ-KY"
+Logo = "FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g"
 
--- Current minting mode ("ON" or "OFF"), ON: auto-mint; OFF: manual-mint
+-- Current minting mode: auto-mint or manual-mint
+-- ON: auto-mint is enabled, OFF: manual minting required (default is 'ON')
 MODE = MODE or "ON"
---T0 token receivers
+
+-- Initial token allocation (T0) for various entities, with allocations dynamically inserted
 T0_ALLOCATION = {
-  -- 1% to liquidity
-  { Author = "Liquidity_Address",      Amount = "10000000000000000000" },
+  -- 1% allocated to liquidity pool
+  { Author = "zxom15ySOXLhpasi8ian4eoKmocUpNpi5BHE1g0Uqas", Amount = "10000000000000000000" },
 
-  -- 5% to pool bootstrap
-  { Author = "Pool_Bootstrap_Address", Amount = "50000000000000000000" },
+  -- 5% allocated to pool bootstrap
+  { Author = "POJfk-XpD1ghZLIZwuSCD8JFDh_FPOZYbizp5MWxczQ", Amount = "50000000000000000000" },
 
-  -- 2% to contributors
-  { Author = "Contributor_1",          Amount = "1000000000000000000" },
-  { Author = "Contributor_2",          Amount = "1000000000000000000" },
-  { Author = "Contributor_3",          Amount = "1000000000000000000" },
-  { Author = "Contributor_4",          Amount = "1000000000000000000" },
-  { Author = "Contributor_5",          Amount = "1000000000000000000" },
-  { Author = "Contributor_6",          Amount = "1000000000000000000" },
-  { Author = "Contributor_7",          Amount = "1000000000000000000" },
-  { Author = "Contributor_8",          Amount = "1000000000000000000" },
-  { Author = "Contributor_9",          Amount = "1000000000000000000" },
-  { Author = "Contributor_10",         Amount = "1000000000000000000" },
-  { Author = "Contributor_11",         Amount = "1000000000000000000" },
-  { Author = "Contributor_12",         Amount = "1000000000000000000" },
-  { Author = "Contributor_13",         Amount = "1000000000000000000" },
-  { Author = "Contributor_14",         Amount = "1000000000000000000" },
-  { Author = "Contributor_15",         Amount = "1000000000000000000" },
-  { Author = "Contributor_16",         Amount = "1000000000000000000" },
-  { Author = "Contributor_17",         Amount = "1000000000000000000" },
-  { Author = "Contributor_18",         Amount = "1000000000000000000" },
-  { Author = "Contributor_19",         Amount = "1000000000000000000" },
-  { Author = "Contributor_20",         Amount = "1000000000000000000" }
+  -- 2% allocated to contributors
+  -- List of contributors and their respective allocations (dynamically generated)
+  { Author = "shUfg1ovwx0J-5y6A4HUOWJ485XHBZXoLe4vS2iOurU", Amount = "10000000000000000000" },
+  { Author = "JyQiTvqKIXZczY57PWOnhELUBIIKc56xWAbcM2_MXrk", Amount = "10000000000000000000" }
 }
 
 return {}

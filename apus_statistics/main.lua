@@ -106,7 +106,7 @@ end)
 Handlers.add("Report.Mint", isMintReportFromAPUSToken, function(msg)
   local status, err = pcall(function()
     if #CycleInfo >= Capacity then
-      table.remove(CycleInfo, 1) -- 删除第一个元素
+      table.remove(CycleInfo, 1)
     end
     local mintReports = msg.Data
 
@@ -185,11 +185,10 @@ Handlers.add("User.Get-User-Estimated-Apus-Token", "User.Get-User-Estimated-Apus
     local share = UserMint[targetUser] or "0"
     local totalShare = TotalMint
 
-    print(share)
     local predictedMontlyReward = bintUtils.toBalanceValue(bint(bintUtils.subtract(MintCapacity,
       MintedSupply)) * 17 // 1000)
     local res = bintUtils.toBalanceValue(bint(predictedMontlyReward) * bint(share) // bint(totalShare))
-    print(res)
+
     msg.reply({ Data = res })
   end)
   if err ~= nil then

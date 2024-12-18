@@ -51,7 +51,7 @@ LastMintTime = LastMintTime or 0
 ]]
 Mint.batchUpdate = function(mintReportList)
     -- Iterate over each mint report and update the corresponding user's mint information
-    Logger.info('Receive mint reports, add mint value for ' .. #mintReportList .. ' users.')
+    Logger.info('Receive mint reports, add mint value for ' .. #mintReportList .. ' user(s).')
     Utils.map(function(mintReport)
         Deposits:updateMintForUser(mintReport.User, mintReport.Mint)
     end, mintReportList)
@@ -94,26 +94,22 @@ Mint.mint = function(msg)
         -- Convert the timestamp from milliseconds to seconds
         local curTime = msg.Timestamp // 1000
 
-        -- Check if the cooldown period has not yet elapsed
-        if LastMintTime ~= 0 and curTime - LastMintTime < MINT_COOL_DOWN then
-            Logger.error(string.format("Mint #%d: Failed, less than five minutes since the last mint(%s).",
-                MintTimes, os.date("%Y-%m-%d %H:%M:%S(UTC)", LastMintTime)))
-            return
-        end
-
         -- If the action is triggered by Cron and the mode is OFF, do not proceed with minting
-        if msg.Action == "Cron" and MODE == "OFF" then
-            Logger.error(string.format(
-                "Mint #%d: Failed, mint cannot be triggered by a cron task because the MODE is set to OFF.",
-                MintTimes))
+        if msg.Action == "Cron" and MODE ~= "ON" then
+            Logger.info(string.format("Mint #%d: Minting triggered by cron is disabled (MODE is OFF).", MintTimes))
             return
         end
 
         -- If the action is triggered by Backup and the mode is ON, do not proceed with minting
-        if msg.Action == "Mint.Backup" and MODE == "ON" then
-            Logger.error(string.format(
-                "Mint #%d: Failed, mint cannot be triggered by backup because the MODE is set to ON.",
-                MintTimes))
+        if msg.Action == "Mint.Backup" and MODE ~= "OFF" then
+            Logger.info(string.format("Mint #%d: Minting triggered by backup is disabled (MODE is ON).", MintTimes))
+            return
+        end
+
+        -- Check if the cooldown period has not yet elapsed
+        if LastMintTime ~= 0 and curTime - LastMintTime < MINT_COOL_DOWN then
+            Logger.info(string.format("Mint #%d: Cooldown not elapsed. Last mint was at %s.", MintTimes,
+                os.date("%Y-%m-%d %H:%M:%S(UTC)", LastMintTime)))
             return
         end
 
@@ -126,9 +122,7 @@ Mint.mint = function(msg)
         -- Retrieve the list of users eligible for minting
         local deposits = Deposits:getToAllocateUsers()
         if not deposits or #deposits == 0 then
-            Logger.error(string.format(
-                "Mint #%d: Failed, no users have contributed a mint, possibly due to no mint reports received.",
-                MintTimes))
+            Logger.error(string.format("Mint #%d: No user to mint for, possibly no reports received.", MintTimes))
             return
         end
 
@@ -149,16 +143,15 @@ Mint.mint = function(msg)
                 return BintUtils.add(acc, v)
             end, "0", Utils.values(Balances))
 
-            Logger.info(string.format(
-                "Mint #%d: Suceeded, allocate for %d users, totally allocated %s, currently minted supply %s",
+            Logger.info(string.format("Mint #%d: Minted for %d user(s). Allocated %s. Total minted supply: %s",
                 MintTimes, #depositsWithReward, BintUtils.subtract(MintedSupply, beforeMintedSupply), MintedSupply))
-            -- Increment the number of times minting has occurred
+            -- Increment the MintTimes
             MintTimes = MintTimes + 1
         end
 
         -- Clear the minting records from the Deposits module
         Deposits:clearMint()
-        Logger.trace(string.format('Mint #%d: Clear mint.', MintTimes))
+        Logger.trace(string.format("Mint #%d: Mint records cleared.", MintTimes))
 
         -- Update the timestamp of the last minting
         if LastMintTime == 0 then

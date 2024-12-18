@@ -521,39 +521,49 @@ async function updateSourceFiles(argv) {
   }
 
   function _generateConfigLua() {
-    return `-- AO Addresses
+    return `-- [[
+--   AO Addresses
+-- ]]
+-- Mint process address used for minting operations (dynamically set)
 AO_MINT_PROCESS = "${AO_MINT_PROCESS}"
+-- APUS stats process address used for tracking statistics (dynamically set from runtime config)
 APUS_STATS_PROCESS = "${runtime.APUS_STATS_PROCESS_ID}"
-APUS_MINT_TRIGGER = "${runtime.APUS_STATS_PROCESS_ID}"
+-- The receiver address for the AO process, typically refers to the AO instance ID (dynamically set)
 AO_RECEIVER = "${AO_RECEIVER}"
 
---Minting cycle interval in seconds
+-- Minting cycle interval (in seconds)
+-- Defines the cooldown period between minting cycles, set to 300 seconds (5 minutes)
 MINT_COOL_DOWN = 300
 
--- The moment the process starts to process with mint reports
+-- Start time for mint processing (initially set to a dynamic value if not defined)
+-- Marks the moment when minting process begins
 StartMintTime = StartMintTime or ${START_MINT_TIME}
 
--- Log levels: trace, debug, info, warn, error, fatal
+-- Log levels to control verbosity of logs
+-- Valid log levels: trace, debug, info, warn, error, fatal (default is 'info')
 LogLevel = LogLevel or 'info'
 
---Tokenomics
-Name = "${conf.APUS_TOKEN_NAME}"
-Ticker = "${conf.APUS_TOKEN_TICKER}"
-Logo = "FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g"
+-- Tokenomics details for the "Apus" token
+-- The token name, ticker symbol, and logo are dynamically loaded from the config
+Name = "${conf.APUS_TOKEN_NAME}"  -- Name of the token
+Ticker = "${conf.APUS_TOKEN_TICKER}"  -- Token symbol for the currency
+Logo = "FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g"  -- Logo identifier for the token
 
--- Current minting mode ("ON" or "OFF"), ON: auto-mint; OFF: manual-mint
+-- Current minting mode: auto-mint or manual-mint
+-- ON: auto-mint is enabled, OFF: manual minting required (default is 'ON')
 MODE = MODE or "ON"
 
---T0 token receivers
+-- Initial token allocation (T0) for various entities, with allocations dynamically inserted
 T0_ALLOCATION = {
-  --1 % to liquidity
+  -- 1% allocated to liquidity pool
   { Author = "${t0Allocation[0].Author}", Amount = "${t0Allocation[0].Amount}" },
 
-  --5 % to pool bootstrap
+  -- 5% allocated to pool bootstrap
   { Author = "${t0Allocation[1].Author}", Amount = "${t0Allocation[1].Amount}" },
 
-  --2 % to contributors
-${t0Allocation.slice(2).map((r) => {
+  -- 2% allocated to contributors
+  -- List of contributors and their respective allocations (dynamically generated)
+  ${t0Allocation.slice(2).map((r) => {
       return `  { Author = "${r.Author}", Amount = "${r.Amount}" }`
     }).join(",\n")
       }
