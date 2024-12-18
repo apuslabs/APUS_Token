@@ -16,12 +16,11 @@ local BintUtils = require("utils.bint_utils")
         table: The updated list of deposit records with assigned rewards.
 ]]
 function Allocator:compute(deposits, reward)
-
     -- Ensure deposits is a valid table and reward is a non-negative number (string type)
     assert(type(deposits) == "table", "Expected deposits to be a table.")
     assert(#deposits > 0, "Deposits table should not be empty.")
     assert(type(reward) == "string", "Expected reward to be a string.")
-    assert(bint(reward) > 0, "Invalid reward value.") 
+    assert(bint(reward) > 0, "Invalid reward value.")
 
     -- Calculate the total minted amount from all deposits
     local totalMint = Utils.reduce(function(acc, r)
@@ -30,23 +29,13 @@ function Allocator:compute(deposits, reward)
 
     -- Ensure totalMint is valid and not zero
     assert(bint(totalMint) > 0, "Total mint value cannot be less than zero.")
-    
-    -- Initialize the remaining reward pool
-    local left = reward
 
     -- Assign rewards to each deposit based on their proportion of the total mint
     Utils.map(function(r)
         -- Calculate the reward for the current deposit
         r.Reward = BintUtils.toBalanceValue(bint(reward) * bint(r.Mint) // bint(totalMint))
-        -- Subtract the assigned reward from the remaining pool
-        left = BintUtils.subtract(left, r.Reward)
         return r
     end, deposits)
-
-    if left == reward then
-        -- TODO No ao minted
-        return
-    end
 
     return deposits
 end

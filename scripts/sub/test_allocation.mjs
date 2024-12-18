@@ -62,10 +62,7 @@ export async function sendMessage(msg, key) {
 
 export async function getAllocationTable(key, asset) {
   try {
-    // 创建钱包对象
     const wallet = new ethers.Wallet(key);
-
-    // 获取地址
     const address = wallet.address;
     const result = await sendMessage({
       Tags: [
@@ -88,10 +85,8 @@ export async function getAllocationTable(key, asset) {
 
 export async function setAllocationTable(key, allocationTable, asset) {
   try {
-    // 创建钱包对象
     const wallet = new ethers.Wallet(key);
 
-    // 获取地址
     const address = wallet.address;
     const result = await sendMessage({
       Tags: [
@@ -114,10 +109,8 @@ export async function setAllocationTable(key, allocationTable, asset) {
 
 export async function testDeposit(amount, key, asset, target) {
   try {
-    // 创建钱包对象
     const wallet = new ethers.Wallet(key);
 
-    // 获取地址
     const address = wallet.address;
     const result = await sendMessage({
       Tags: [
@@ -147,12 +140,12 @@ async function checkSingleUserBalance(key, asset, argv) {
     const wallet = new ethers.Wallet(key);
     const allocationTable = await asyncWithBreathingLog(getAllocationTable, [key, asset], `Fetch allocation table of User ${wallet.address}`)
     let totalBalance = (allocationTable ?? []).reduce(function (acc, v) {
-      return Big(acc).plus(Big(v.Amount)).toFixed(); // 累加并转换回字符串
+      return Big(acc).plus(Big(v.Amount)).toFixed();
     }, "0")
 
     let totalBalanceForTarget = (allocationTable ?? []).reduce(function (acc, v) {
       if (v.Recipient == argv.target) {
-        return Big(acc).plus(Big(v.Amount)).toFixed(); // 累加并转换回字符串
+        return Big(acc).plus(Big(v.Amount)).toFixed();
       } else {
         return acc
       }

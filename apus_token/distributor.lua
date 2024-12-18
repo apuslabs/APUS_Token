@@ -1,7 +1,5 @@
 local Distributor = { _version = "0.0.1" }
 
-local Utils = require('.utils')
-
 --[[
     Function: bindingWallet
     Associates a user's account with a specific wallet address.
@@ -25,21 +23,23 @@ Distributor.bindingWallet = function(user, wallet)
   Deposits:upsert(record)
 end
 
+--[[
+    Function: getWallet
+    Retrieves the wallet address associated with a user.
+
+    Parameters:
+        user (string): The identifier of the user.
+
+    Returns:
+        string: The wallet address associated with the user, or an empty string if no wallet address is found.
+]]
 Distributor.getWallet = function(user)
   local record = Deposits:getByUser(user) or {
     User = user,
     Mint = "0"
   }
+  -- If no wallet is associated, return an empty string
   return record.Recipient or ""
-end
-
--- @TEST
-Distributor.testSetWallet = function()
-  local records = Deposits:getAll()
-  Utils.map(function(r)
-    r.Recipient = ao.id
-    Deposits:upsert(r)
-  end, records)
 end
 
 return Distributor
