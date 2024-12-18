@@ -18,8 +18,8 @@ const cmd = yargs(hideBin(process.argv));
 
 // sub commands
 const create_config = {
-  command: 'create_config', // 子命令名称和参数定义
-  describe: 'Create new config for deployment', // 命令描述
+  command: 'create_config',
+  describe: 'Create new config for deployment',
   builder: (yargs) => {
     yargs
       .option('out', {
@@ -59,8 +59,8 @@ const create_config = {
 };
 
 const deployCommand = {
-  command: 'deploy', // 子命令名称和参数定义
-  describe: 'deploy the processes', // 命令描述
+  command: 'deploy',
+  describe: 'deploy the processes',
   builder: (yargs) => {
     yargs
       .positional('token_process_name', {
@@ -240,7 +240,7 @@ cmd
   .command(monitorCommand)
   .command(checkAfterDeployCommand)
   .command(mintCommand)
-  .demandCommand(1, chalk.red('You must provide at least one command.')) // 必须输入命令
+  .demandCommand(1, chalk.red('You must provide at least one command.'))
   .fail((msg, err, yargs) => {
     if (err) {
       console.error(chalk.red('Error:'), err.message);
@@ -248,8 +248,8 @@ cmd
       console.error(chalk.red('Error:'), msg);
     }
     console.log('\n');
-    yargs.showHelp(); // 自动显示帮助信息
+    yargs.showHelp();
     process.exit(1);
   })
-  .help() // 显示帮助信息
-  .argv;  // 解析参数
+  .help()
+  .argv;

@@ -122,7 +122,7 @@ Mint.mint = function(msg)
         -- Retrieve the list of users eligible for minting
         local deposits = Deposits:getToAllocateUsers()
         if not deposits or #deposits == 0 then
-            Logger.error(string.format("Mint #%d: No user to mint for, possibly no reports received.", MintTimes))
+            Logger.warn(string.format("Mint #%d: No user to mint for, possibly no reports received.", MintTimes))
             return
         end
 
@@ -151,7 +151,6 @@ Mint.mint = function(msg)
 
         -- Clear the minting records from the Deposits module
         Deposits:clearMint()
-        Logger.trace(string.format("Mint #%d: Mint records cleared.", MintTimes))
 
         -- Update the timestamp of the last minting
         if LastMintTime == 0 then
@@ -166,8 +165,8 @@ Mint.mint = function(msg)
 
     -- If an error occurred during the minting process, print and return the error
     if err then
-        print(err)
-        return err
+        Logger.error(err)
+        return
     end
 
     -- Return "OK" to indicate successful minting
