@@ -53,7 +53,7 @@ async function _sendMessageAndGetResult(process, data, tags) {
 }
 
 export default async function mint(argv) {
-  const token_process = _readRuntime().APUS_TOKEN_PROCESS_ID;
+  const token_process = argv.target ? argv.target : _readRuntime().APUS_TOKEN_PROCESS_ID;
   console.log(token_process)
   try {
     await asyncWithBreathingLog(_sendMessageAndGetResult, [token_process, "", _getTagsFromObj({ Action: "Mint.Backup" })], "send message to trigger mint")

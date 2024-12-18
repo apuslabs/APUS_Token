@@ -215,6 +215,12 @@ const mintCommand = {
   command: 'mint',
   describe: 'call Mint.Backup method',
   builder: (yargs) => {
+    yargs
+      .option('target', {
+        describe: 'The target address of allocation',
+        type: 'string',
+        demandOption: false
+      })
   },
   handler: (argv) => {
     mint(argv)
