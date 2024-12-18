@@ -34,7 +34,7 @@ local function isMintReportFromAOMint(msg)
   return msg.Action == "Report.Mint" and msg.From == AO_MINT_PROCESS
 end
 
-local function isProcessOwner(msg)
+local function isMintBackupFromProcessOwner(msg)
   return msg.Action == "Mint.Backup" and msg.From == ao.env.Process.Owner
 end
 
@@ -60,7 +60,7 @@ end)
 Handlers.add("Mint.Mint", "Cron", Mint.mint)
 
 -- Handler for Mint Backup process (MODE = "OFF")
-Handlers.add("Mint.Backup", isProcessOwner, Mint.mintBackUp)
+Handlers.add("Mint.Backup", isMintBackupFromProcessOwner, Mint.mintBackUp)
 
 -- Handler to update user's recipient wallet
 Handlers.add("User.Update-Recipient", "User.Update-Recipient", function(msg)
