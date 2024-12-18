@@ -10,6 +10,9 @@ MINT_COOL_DOWN = 300
 -- The moment the process starts to process with mint reports
 StartMintTime = StartMintTime or 0
 
+-- Log levels: trace, debug, info, warn, error, fatal
+LogLevel = LogLevel or 'info'
+
 -- Tokenomics
 Name = "Apus"
 Ticker = "Apus"

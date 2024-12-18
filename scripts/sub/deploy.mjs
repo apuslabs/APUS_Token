@@ -533,10 +533,13 @@ MINT_COOL_DOWN = 300
 -- The moment the process starts to process with mint reports
 StartMintTime = StartMintTime or ${START_MINT_TIME}
 
+-- Log levels: trace, debug, info, warn, error, fatal
+LogLevel = LogLevel or 'info'
+
 --Tokenomics
 Name = "${conf.APUS_TOKEN_NAME}"
 Ticker = "${conf.APUS_TOKEN_TICKER}"
-Logo = "tesHcQpU6KWRMflKUnJpcsTCVwjV6BTaWLx_BV233JU"
+Logo = "FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g"
 
 -- Current minting mode ("ON" or "OFF"), ON: auto-mint; OFF: manual-mint
 MODE = MODE or "ON"

@@ -6,6 +6,7 @@ local json            = require('json')
 local Utils           = require('.utils')
 local BintUtils       = require('utils.bint_utils')
 local EthAddressUtils = require('utils.eth_address')
+local ao              = require('ao')
 
 -- Constants
 INITIAL_MINT_AMOUNT   = "80000000000000000000" -- 80,000,000 tokens with denomination
@@ -24,6 +25,7 @@ Mint                  = require("mint")
 Token                 = require('token')
 Allocator             = require('allocator')
 Distributor           = require('distributor')
+Logger                = require('utils.log')
 
 require('config')
 
@@ -32,10 +34,14 @@ local function isMintReportFromAOMint(msg)
   return msg.Action == "Report.Mint" and msg.From == AO_MINT_PROCESS
 end
 
+local function isProcessOwner(msg)
+  return msg.Action == "Mint.Backup" and msg.From == ao.env.Process.Owner
+end
+
 -- Handler for AO Mint Report
 Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   if msg.Timestamp // 1000 <= StartMintTime then
-    print("Not receiving messages until " .. os.date("%Y-%m-%d %H:%M:%S", StartMintTime) .. "(UTC)")
+    Logger.error("Not receiving messages until " .. os.date("%Y-%m-%d %H:%M:%S", StartMintTime) .. "(UTC)")
     return
   end
   -- Filter reports where the recipient matches the current process ID
@@ -53,7 +59,7 @@ end)
 Handlers.add("Mint.Mint", "Cron", Mint.mint)
 
 -- Handler for Mint Backup process (MODE = "OFF")
-Handlers.add("Mint.Backup", "Mint.Backup", Mint.mintBackUp)
+Handlers.add("Mint.Backup", isProcessOwner, Mint.mintBackUp)
 
 -- Handler to update user's recipient wallet
 Handlers.add("User.Update-Recipient", "User.Update-Recipient", function(msg)
