@@ -9,7 +9,6 @@ local bint = require(".bint")(256)
 local BintUtils = require("utils.bint_utils")
 
 Allocator = nil
--- 测试类
 TestAllocator = {}
 
 function TestAllocator:setup()
