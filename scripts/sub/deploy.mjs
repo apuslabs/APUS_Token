@@ -666,160 +666,13 @@ async function sendEvalAndCheckRes({ process, line, assertion }) {
       _insertChecking(checkingName)
     }
   } catch (error) {
-    simpleError(`${error.message}`, true)
+    let errorMessage;
+    if (error.message == 'fetch failed') {
+      errorMessage = 'Network Error'
+    }
+    simpleError(`${errorMessage}`, true)
     throw error
   }
-}
-
-async function afterCheck(argv) {
-  // if (argv.env == "production") {
-  //   simpleSuccess(`Skip after check in env ${argv.env}`)
-  //   return
-  // }
-  console.log("\nStart checking...")
-  const runtime = _readRuntime();
-  const conf = _readConfig();
-  const apusTokenProcess = runtime.APUS_TOKEN_PROCESS_ID;
-  const apusStatsProcess = runtime.APUS_STATS_PROCESS_ID;
-
-  async function checkIfSubscribed() {
-    const results = (await _getProcessResults(apusTokenProcess) ?? { edges: [] }).edges
-    const target = results.find((r) => {
-      return r.node?.Messages?.[0] && r.node.Messages[0].Target == AO_MINT_PROCESS && r.node.Messages[0].Tags.find((t) => { return t.name == "Action" && t.value == "Recipient.Subscribe-Report" })
-    })
-    if (!target) {
-      throw Error(`Not subscribed`)
-    }
-  }
-
-  // try {
-  //   if ((_readCheckings() || []).includes(`[${apusTokenProcess}] Check if Subscribed`)) {
-  //     simpleSuccess(`[${apusTokenProcess}] Check if Subscribed`)
-  //   } else {
-  //     await asyncWithBreathingLog(checkIfSubscribed, [], `[${apusTokenProcess}] Check if Subscribed`)
-  //     _insertChecking(`[${apusTokenProcess}] Check if Subscribed`)
-  //   }
-  // } catch (error) {
-  //   throw error
-  // }
-
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "INITIAL_MINT_AMOUNT", assertion: "80000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "AO_MINT_PROCESS", assertion: AO_MINT_PROCESS }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_STATS_PROCESS", assertion: runtime.APUS_STATS_PROCESS_ID }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_MINT_TRIGGER", assertion: runtime.APUS_STATS_PROCESS_ID }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "AO_RECEIVER", assertion: AO_RECEIVER }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MINT_COOL_DOWN", assertion: 300 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "StartMintTime", assertion: START_MINT_TIME }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Name", assertion: conf.APUS_TOKEN_NAME }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Ticker", assertion: conf.APUS_TOKEN_TICKER }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Logo", assertion: "tesHcQpU6KWRMflKUnJpcsTCVwjV6BTaWLx_BV233JU" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MODE", assertion: "ON" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Variant", assertion: "0.0.3" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Denomination", assertion: 12 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "TotalSupply", assertion: "1000000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "IsTNComing", assertion: "" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MINT_CAPACITY", assertion: "1000000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_MINT_PCT_1", assertion: 19421654225 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_MINT_PCT_2", assertion: 16473367976 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_MINT_UNIT", assertion: 10000000000000000 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "INTERVALS_PER_YEAR", assertion: 365.25 * 24 * 12 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "DAYS_PER_MONTH", assertion: 30.4375 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "INTERVALS_PER_MONTH", assertion: 8766 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "INITIAL_MINT_AMOUNT", assertion: "80000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MintedSupply", assertion: "80000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MintTimes", assertion: 1 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "LastMintTime", assertion: 0 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Initialized", assertion: true }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "require('json').encode(T0_ALLOCATION)", assertion: _readT0Allocation() }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "require('json').encode(Balances)", assertion: _readT0Allocation().reduce(function (acc, v) { acc[v.Author] = v.Amount; return acc }, {}) }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "APUS_MINT_PROCESS", assertion: runtime.APUS_TOKEN_PROCESS_ID }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(CycleInfo)", assertion: [] }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "Capacity", assertion: 1 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "TotalMint", assertion: "0" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "MintedSupply", assertion: "0" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "MintCapacity", assertion: "1000000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(AssetStaking)", assertion: [] }  // empty table is treated as list
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(AssetAOAmount)", assertion: [] }  // empty table is treated as list
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(AssetWeight)", assertion: [] }  // empty table is treated as list
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(UserMint)", assertion: [] }  // empty table is treated as list
-  )
 }
 
 async function showResult(argv) {
@@ -841,9 +694,9 @@ export default async function deploy(argv) {
     await updateSourceFiles(argv) // get env to set AO_MINT_PROCESS
     await loadLua()
     await monitorProcesses()
-    // await afterCheck(argv)
     await showResult(argv)
   } catch (error) {
     console.log(error)
+    console.log(JSON.stringify(error))
   }
 }

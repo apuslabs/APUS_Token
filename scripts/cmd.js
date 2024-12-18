@@ -10,6 +10,7 @@ import generateTestAddresses from './sub/generate_ether_accounts.mjs';
 import allowMintReport from './sub/allow_mint_report.mjs';
 import sendMessageToToken from './sub/send_message_to_token.mjs';
 import monitorProcess from './sub/monitor.mjs';
+import { checkAfterDeploy } from './sub/check_after_deploy.mjs';
 
 
 const cmd = yargs(hideBin(process.argv));
@@ -193,6 +194,22 @@ const monitorCommand = {
   }
 }
 
+const checkAfterDeployCommand = {
+  command: 'check_after_deploy',
+  describe: 'Check after deploying the process',
+  builder: (yargs) => {
+    yargs
+      .option('env', {
+        description: 'production or test',
+        type: 'string',
+        default: "test"
+      })
+  },
+  handler: (argv) => {
+    checkAfterDeploy(argv)
+  }
+}
+
 // 定义子命令
 cmd
   .scriptName('npm run helper')
@@ -204,6 +221,7 @@ cmd
   .command(allowMintReportCommand)
   .command(sendMessageToTokenCommand)
   .command(monitorCommand)
+  .command(checkAfterDeployCommand)
   .demandCommand(1, chalk.red('You must provide at least one command.')) // 必须输入命令
   .fail((msg, err, yargs) => {
     if (err) {
