@@ -51,6 +51,7 @@ LastMintTime = LastMintTime or 0
 ]]
 Mint.batchUpdate = function(mintReportList)
     -- Iterate over each mint report and update the corresponding user's mint information
+    Logger.info('Receive mint reports, add mint value for ' .. #mintReportList .. ' users.')
     Utils.map(function(mintReport)
         Deposits:updateMintForUser(mintReport.User, mintReport.Mint)
     end, mintReportList)
@@ -95,14 +96,25 @@ Mint.mint = function(msg)
 
         -- Check if the cooldown period has not yet elapsed
         if LastMintTime ~= 0 and curTime - LastMintTime < MINT_COOL_DOWN then
-            print("Not cool down yet")
-            return "Not cool down yet"
+            Logger.error(string.format("Mint #%d: Failed, less than five minutes since the last mint(%s).",
+                MintTimes, os.date("%Y-%m-%d %H:%M:%S(UTC)", LastMintTime)))
+            return
         end
 
         -- If the action is triggered by Cron and the mode is OFF, do not proceed with minting
         if msg.Action == "Cron" and MODE == "OFF" then
-            print("Not Minting by CRON untils MODE is set to ON")
-            return "Not Minting by CRON untils MODE is set to ON"
+            Logger.error(string.format(
+                "Mint #%d: Failed, mint cannot be triggered by a cron task because the MODE is set to OFF.",
+                MintTimes))
+            return
+        end
+
+        -- If the action is triggered by Backup and the mode is ON, do not proceed with minting
+        if msg.Action == "Mint.Backup" and MODE == "ON" then
+            Logger.error(string.format(
+                "Mint #%d: Failed, mint cannot be triggered by backup because the MODE is set to ON.",
+                MintTimes))
+            return
         end
 
         -- Calculate how many times minting should occur based on the cooldown period
@@ -114,8 +126,10 @@ Mint.mint = function(msg)
         -- Retrieve the list of users eligible for minting
         local deposits = Deposits:getToAllocateUsers()
         if not deposits or #deposits == 0 then
-            print("No users in the pool.")
-            return "No users in the pool."
+            Logger.error(string.format(
+                "Mint #%d: Failed, no users have contributed a mint, possibly due to no mint reports received.",
+                MintTimes))
+            return
         end
 
         -- Perform minting for the calculated number of times
@@ -124,6 +138,8 @@ Mint.mint = function(msg)
             local releaseAmount = Mint.currentMintAmount()
             -- Compute the reward for each user based on their deposit
             local depositsWithReward = Allocator:compute(deposits, releaseAmount)
+
+            local beforeMintedSupply = MintedSupply
             -- Update each user's balance with the calculated reward
             Utils.map(function(r)
                 Balances[r.Recipient] = BintUtils.add(Balances[r.Recipient] or "0", r.Reward)
@@ -132,12 +148,17 @@ Mint.mint = function(msg)
             MintedSupply = Utils.reduce(function(acc, v)
                 return BintUtils.add(acc, v)
             end, "0", Utils.values(Balances))
+
+            Logger.info(string.format(
+                "Mint #%d: Suceeded, allocate for %d users, totally allocated %s, currently minted supply %s",
+                MintTimes, #depositsWithReward, BintUtils.subtract(MintedSupply, beforeMintedSupply), MintedSupply))
+            -- Increment the number of times minting has occurred
+            MintTimes = MintTimes + 1
         end
 
-        -- Increment the number of times minting has occurred
-        MintTimes = MintTimes + times
         -- Clear the minting records from the Deposits module
         Deposits:clearMint()
+        Logger.trace(string.format('Mint #%d: Clear mint.', MintTimes))
 
         -- Update the timestamp of the last minting
         if LastMintTime == 0 then
@@ -172,7 +193,7 @@ end
 ]]
 function Mint.mintBackUp(msg)
     -- Call the main mint function with the provided Timestamp
-    Mint.mint({ Timestamp = msg.Timestamp })
+    Mint.mint(msg)
 end
 
 -- Export the Mint module

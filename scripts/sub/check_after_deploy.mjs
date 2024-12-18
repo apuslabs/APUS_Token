@@ -297,6 +297,9 @@ async function afterCheck(argv) {
     { process: apusTokenProcess, line: "AO_RECEIVER", assertion: AO_RECEIVER }
   )
   await sendEvalAndCheckRes(
+    { process: apusTokenProcess, line: "LogLevel", assertion: "info" }
+  )
+  await sendEvalAndCheckRes(
     { process: apusTokenProcess, line: "MINT_COOL_DOWN", assertion: 300 }
   )
   await sendEvalAndCheckRes(
@@ -309,7 +312,7 @@ async function afterCheck(argv) {
     { process: apusTokenProcess, line: "Ticker", assertion: conf.APUS_TOKEN_TICKER }
   )
   await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Logo", assertion: "tesHcQpU6KWRMflKUnJpcsTCVwjV6BTaWLx_BV233JU" }
+    { process: apusTokenProcess, line: "Logo", assertion: "FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g" }
   )
   await sendEvalAndCheckRes(
     { process: apusTokenProcess, line: "MODE", assertion: "ON" }
@@ -400,7 +403,7 @@ async function afterCheck(argv) {
   )
 
   await sendDryRunAndCheckTags({
-    process: apusTokenProcess, line: 'Token.info', assertion: { Name: _readConfig().APUS_TOKEN_NAME, Logo: 'tesHcQpU6KWRMflKUnJpcsTCVwjV6BTaWLx_BV233JU', Denomination: '12', Ticker: _readConfig().APUS_TOKEN_TICKER }, tags: _getTagsFromObj({ Action: 'Info' })
+    process: apusTokenProcess, line: 'Token.info', assertion: { Name: _readConfig().APUS_TOKEN_NAME, Logo: 'FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g', Denomination: '12', Ticker: _readConfig().APUS_TOKEN_TICKER }, tags: _getTagsFromObj({ Action: 'Info' })
   })
 
   await sendDryRunAndCheckRes({

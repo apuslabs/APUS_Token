@@ -207,7 +207,6 @@ end
 ]]
 Token.mintedSupply = function(msg)
     msg.reply({ Data = MintedSupply })
-    print("Id: " .. msg.From .. " Requested Minted Supply: " .. MintedSupply)
 end
 
 --[[

@@ -11,6 +11,7 @@ import allowMintReport from './sub/allow_mint_report.mjs';
 import sendMessageToToken from './sub/send_message_to_token.mjs';
 import monitorProcess from './sub/monitor.mjs';
 import { checkAfterDeploy } from './sub/check_after_deploy.mjs';
+import mint from './sub/mint.mjs';
 
 
 const cmd = yargs(hideBin(process.argv));
@@ -210,6 +211,22 @@ const checkAfterDeployCommand = {
   }
 }
 
+const mintCommand = {
+  command: 'mint',
+  describe: 'call Mint.Backup method',
+  builder: (yargs) => {
+    yargs
+      .option('target', {
+        describe: 'The target address of allocation',
+        type: 'string',
+        demandOption: false
+      })
+  },
+  handler: (argv) => {
+    mint(argv)
+  }
+}
+
 // 定义子命令
 cmd
   .scriptName('npm run helper')
@@ -222,6 +239,7 @@ cmd
   .command(sendMessageToTokenCommand)
   .command(monitorCommand)
   .command(checkAfterDeployCommand)
+  .command(mintCommand)
   .demandCommand(1, chalk.red('You must provide at least one command.')) // 必须输入命令
   .fail((msg, err, yargs) => {
     if (err) {
