@@ -291,9 +291,6 @@ async function afterCheck(argv) {
     { process: apusTokenProcess, line: "APUS_STATS_PROCESS", assertion: runtime.APUS_STATS_PROCESS_ID }
   )
   await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_MINT_TRIGGER", assertion: runtime.APUS_STATS_PROCESS_ID }
-  )
-  await sendEvalAndCheckRes(
     { process: apusTokenProcess, line: "AO_RECEIVER", assertion: AO_RECEIVER }
   )
   await sendEvalAndCheckRes(
