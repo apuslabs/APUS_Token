@@ -38,6 +38,10 @@ local function isMintBackupFromProcessOwner(msg)
   return msg.Action == "Mint.Backup" and msg.From == ao.env.Process.Owner
 end
 
+local function isCron(msg)
+  return msg.Action == "Cron" and (msg.From == ao.env.Process.Owner or msg.From == ao.id)
+end
+
 -- Handler for AO Mint Report
 Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   if msg.Timestamp // 1000 <= StartMintTime then
@@ -59,7 +63,7 @@ end)
 -- If T0 allocation is done
 T0Allocated = T0Allocated or false
 -- Cron job handler to trigger minting process (MODE = "ON")
-Handlers.add("Mint.Mint", "Cron", function(msg)
+Handlers.add("Mint.Mint", isCron, function(msg)
   if msg.Timestamp // 1000 <= StartMintTime then
     return -- receive mint request from cron and return silently before TGE
   end
