@@ -524,11 +524,11 @@ async function updateSourceFiles(argv) {
     return `-- [[
 --   AO Addresses
 -- ]]
--- Mint process address used for minting operations (dynamically set)
+-- Mint process address used for minting operations
 AO_MINT_PROCESS = "${AO_MINT_PROCESS}"
--- APUS stats process address used for tracking statistics (dynamically set from runtime config)
+-- APUS stats process address used for tracking statistics
 APUS_STATS_PROCESS = "${runtime.APUS_STATS_PROCESS_ID}"
--- The receiver address for the AO process, typically refers to the AO instance ID (dynamically set)
+-- The receiver address for the AO process, typically refers to the AO instance ID
 AO_RECEIVER = "${AO_RECEIVER}"
 
 -- Minting cycle interval (in seconds)
@@ -553,7 +553,7 @@ Logo = "sixqgAh5MEevkhwH4JuCYwmumaYMTOBi3N5_N1GQ6Uc"  -- Logo identifier for the
 -- ON: auto-mint is enabled, OFF: manual minting required (default is 'ON')
 MODE = MODE or "ON"
 
--- Initial token allocation (T0) for various entities, with allocations dynamically inserted
+-- Initial token allocation (T0) for various entities
 T0_ALLOCATION = {
   -- 1% allocated to liquidity pool
   { Author = "${t0Allocation[0].Author}", Amount = "${t0Allocation[0].Amount}" },
@@ -562,7 +562,7 @@ T0_ALLOCATION = {
   { Author = "${t0Allocation[1].Author}", Amount = "${t0Allocation[1].Amount}" },
 
   -- 2% allocated to contributors
-  -- List of contributors and their respective allocations (dynamically generated)
+  -- List of contributors and their respective allocations
   ${t0Allocation.slice(2).map((r) => {
       return `  { Author = "${r.Author}", Amount = "${r.Amount}" }`
     }).join(",\n")
