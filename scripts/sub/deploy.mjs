@@ -547,7 +547,7 @@ LogLevel = LogLevel or 'info'
 -- The token name, ticker symbol, and logo are dynamically loaded from the config
 Name = "${conf.APUS_TOKEN_NAME}"  -- Name of the token
 Ticker = "${conf.APUS_TOKEN_TICKER}"  -- Token symbol for the currency
-Logo = "FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g"  -- Logo identifier for the token
+Logo = "sixqgAh5MEevkhwH4JuCYwmumaYMTOBi3N5_N1GQ6Uc"  -- Logo identifier for the token
 
 -- Current minting mode: auto-mint or manual-mint
 -- ON: auto-mint is enabled, OFF: manual minting required (default is 'ON')
