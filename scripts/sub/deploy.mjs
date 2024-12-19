@@ -358,14 +358,14 @@ function _updateApusStatsProcessAndName(process, name) {
 }
 
 async function prepareConfig(argv) {
+  const twoPercentAllocation = JSON.parse(fs.readFileSync('scripts/final_rewards_cal_same_user_BigInt.json', 'utf-8'))
   const defaultT0Allocation = `- Author: zxom15ySOXLhpasi8ian4eoKmocUpNpi5BHE1g0Uqas
   Amount: "10000000000000000000"
 - Author: POJfk-XpD1ghZLIZwuSCD8JFDh_FPOZYbizp5MWxczQ
   Amount: "50000000000000000000"
-- Author: shUfg1ovwx0J-5y6A4HUOWJ485XHBZXoLe4vS2iOurU
-  Amount: "10000000000000000000"
-- Author: JyQiTvqKIXZczY57PWOnhELUBIIKc56xWAbcM2_MXrk
-  Amount: "10000000000000000000"`
+${twoPercentAllocation.map(r => {
+    return `- Author: ${r.author}\n  Amount: "${r.reward}"`
+  }).join('\n')}`
 
   function _checkConfigPath(argv) {
     if (!fs.existsSync(ConfigPath) || !fs.statSync(ConfigPath).isDirectory()) {
@@ -524,11 +524,11 @@ async function updateSourceFiles(argv) {
     return `-- [[
 --   AO Addresses
 -- ]]
--- Mint process address used for minting operations
+-- Mint process address used for minting operations (dynamically set)
 AO_MINT_PROCESS = "${AO_MINT_PROCESS}"
--- APUS stats process address used for tracking statistics
+-- APUS stats process address used for tracking statistics (dynamically set from runtime config)
 APUS_STATS_PROCESS = "${runtime.APUS_STATS_PROCESS_ID}"
--- The receiver address for the AO process, typically refers to the AO instance ID
+-- The receiver address for the AO process, typically refers to the AO instance ID (dynamically set)
 AO_RECEIVER = "${AO_RECEIVER}"
 
 -- Minting cycle interval (in seconds)
@@ -553,7 +553,7 @@ Logo = "sixqgAh5MEevkhwH4JuCYwmumaYMTOBi3N5_N1GQ6Uc"  -- Logo identifier for the
 -- ON: auto-mint is enabled, OFF: manual minting required (default is 'ON')
 MODE = MODE or "ON"
 
--- Initial token allocation (T0) for various entities
+-- Initial token allocation (T0) for various entities, with allocations dynamically inserted
 T0_ALLOCATION = {
   -- 1% allocated to liquidity pool
   { Author = "${t0Allocation[0].Author}", Amount = "${t0Allocation[0].Amount}" },
@@ -562,8 +562,8 @@ T0_ALLOCATION = {
   { Author = "${t0Allocation[1].Author}", Amount = "${t0Allocation[1].Amount}" },
 
   -- 2% allocated to contributors
-  -- List of contributors and their respective allocations
-  ${t0Allocation.slice(2).map((r) => {
+  -- List of contributors and their respective allocations (dynamically generated)
+${t0Allocation.slice(2).map((r) => {
       return `  { Author = "${r.Author}", Amount = "${r.Amount}" }`
     }).join(",\n")
       }

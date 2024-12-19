@@ -404,13 +404,7 @@ async function afterCheck(argv) {
   })
 
   await sendDryRunAndCheckRes({
-    process: apusTokenProcess, line: 'Token.balances', assertion: _readT0Allocation().reduce(function (acc, v) { acc[v.Author] = v.Amount; return acc }, {}), tags: _getTagsFromObj({ Action: 'Balances' })
-  })
-
-  await sendDryRunAndCheckRes({
-    process: apusTokenProcess, line: `Token.balance of 'POJfk-XpD1ghZLIZwuSCD8JFDh_FPOZYbizp5MWxczQ'`, assertion: "50000000000000000000", tags: _getTagsFromObj({
-      Action: 'Balance', Recipient: 'POJfk-XpD1ghZLIZwuSCD8JFDh_FPOZYbizp5MWxczQ'
-    })
+    process: apusTokenProcess, line: 'Token.balances', assertion: [], tags: _getTagsFromObj({ Action: 'Balances' })
   })
 
   await sendDryRunAndCheckRes({
@@ -420,7 +414,7 @@ async function afterCheck(argv) {
   })
 
   await sendDryRunAndCheckRes({
-    process: apusTokenProcess, line: `Token.totalSupply`, assertion: "80000000000000000000", tags: _getTagsFromObj({
+    process: apusTokenProcess, line: `Token.mintedSupply`, assertion: "0", tags: _getTagsFromObj({
       Action: 'Minted-Supply'
     })
   })

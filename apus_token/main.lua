@@ -38,6 +38,10 @@ local function isMintBackupFromProcessOwner(msg)
   return msg.Action == "Mint.Backup" and msg.From == ao.env.Process.Owner
 end
 
+local function isCron(msg)
+  return msg.Action == "Cron" and (msg.From == ao.env.Process.Owner or msg.From == ao.id)
+end
+
 -- Handler for AO Mint Report
 Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   if msg.Timestamp // 1000 <= StartMintTime then
@@ -56,8 +60,33 @@ Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   Mint.batchUpdate(reports)
 end)
 
+-- If T0 allocation is done
+T0Allocated = T0Allocated or false
 -- Cron job handler to trigger minting process (MODE = "ON")
-Handlers.add("Mint.Mint", "Cron", Mint.mint)
+Handlers.add("Mint.Mint", isCron, function(msg)
+  if msg.Timestamp // 1000 <= StartMintTime then
+    return -- receive mint request from cron and return silently before TGE
+  end
+
+  if not T0Allocated then
+    T0Allocated = true
+    local beforeSupply = MintedSupply
+    -- set balance for each user
+    Utils.map(function(r)
+      Balances[r.Author] = BintUtils.add(Balances[r.Author] or "0", r.Amount)
+    end, T0_ALLOCATION)
+
+    -- set minted supply
+    MintedSupply = Utils.reduce(function(acc, value)
+      return BintUtils.add(acc, value)
+    end, "0", Utils.values(Balances))
+
+    Logger.info(string.format('Allocated %s to %d users, current minted supply: %s',
+      BintUtils.subtract(MintedSupply, beforeSupply), #T0_ALLOCATION, MintedSupply))
+  end
+
+  Mint.mint(msg)
+end)
 
 -- Handler for Mint Backup process (MODE = "OFF")
 Handlers.add("Mint.Backup", isMintBackupFromProcessOwner, Mint.mintBackUp)
@@ -124,14 +153,4 @@ Initialized = Initialized or false
     return BintUtils.add(acc, value.Amount)
   end, "0", T0_ALLOCATION)
   assert(sum == INITIAL_MINT_AMOUNT, "Initiali Mint Amount Not Equal to 80000000000000000000")
-
-  -- set balance for each user
-  Utils.map(function(r)
-    Balances[r.Author] = BintUtils.add(Balances[r.Author] or "0", r.Amount)
-  end, T0_ALLOCATION)
-
-  -- set minted supply
-  MintedSupply = Utils.reduce(function(acc, value)
-    return BintUtils.add(acc, value)
-  end, "0", Utils.values(Balances))
 end)()
