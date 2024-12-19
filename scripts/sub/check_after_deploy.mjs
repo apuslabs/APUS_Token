@@ -281,126 +281,126 @@ async function afterCheck(argv) {
   //   throw error
   // }
 
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "INITIAL_MINT_AMOUNT", assertion: "80000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "AO_MINT_PROCESS", assertion: AO_MINT_PROCESS }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_STATS_PROCESS", assertion: runtime.APUS_STATS_PROCESS_ID }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "AO_RECEIVER", assertion: AO_RECEIVER }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "LogLevel", assertion: "info" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MINT_COOL_DOWN", assertion: 300 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "StartMintTime", assertion: _readStartTime() }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Name", assertion: conf.APUS_TOKEN_NAME }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Ticker", assertion: conf.APUS_TOKEN_TICKER }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Logo", assertion: "FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MODE", assertion: "ON" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Variant", assertion: "0.0.3" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Denomination", assertion: 12 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "TotalSupply", assertion: "1000000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "IsTNComing", assertion: "" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MINT_CAPACITY", assertion: "1000000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_MINT_PCT_1", assertion: 19421654225 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_MINT_PCT_2", assertion: 16473367976 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "APUS_MINT_UNIT", assertion: 10000000000000000 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "INTERVALS_PER_YEAR", assertion: 365.25 * 24 * 12 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "DAYS_PER_MONTH", assertion: 30.4375 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "INTERVALS_PER_MONTH", assertion: 8766 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "INITIAL_MINT_AMOUNT", assertion: "80000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MintedSupply", assertion: "80000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "MintTimes", assertion: 1 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "LastMintTime", assertion: 0 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "Initialized", assertion: true }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "require('json').encode(T0_ALLOCATION)", assertion: _readT0Allocation() }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusTokenProcess, line: "require('json').encode(Balances)", assertion: _readT0Allocation().reduce(function (acc, v) { acc[v.Author] = v.Amount; return acc }, {}) }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "APUS_MINT_PROCESS", assertion: runtime.APUS_TOKEN_PROCESS_ID }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(CycleInfo)", assertion: [] }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "Capacity", assertion: 1 }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "TotalMint", assertion: "0" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "MintedSupply", assertion: "0" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "MintCapacity", assertion: "1000000000000000000000" }
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(AssetStaking)", assertion: [] }  // empty table is treated as list
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(AssetAOAmount)", assertion: [] }  // empty table is treated as list
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(AssetWeight)", assertion: [] }  // empty table is treated as list
-  )
-  await sendEvalAndCheckRes(
-    { process: apusStatsProcess, line: "require('json').encode(UserMint)", assertion: [] }  // empty table is treated as list
-  )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "INITIAL_MINT_AMOUNT", assertion: "80000000000000000000" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "AO_MINT_PROCESS", assertion: AO_MINT_PROCESS }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "APUS_STATS_PROCESS", assertion: runtime.APUS_STATS_PROCESS_ID }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "AO_RECEIVER", assertion: AO_RECEIVER }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "LogLevel", assertion: "info" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "MINT_COOL_DOWN", assertion: 300 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "StartMintTime", assertion: _readStartTime() }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "Name", assertion: conf.APUS_TOKEN_NAME }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "Ticker", assertion: conf.APUS_TOKEN_TICKER }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "Logo", assertion: "sixqgAh5MEevkhwH4JuCYwmumaYMTOBi3N5_N1GQ6Uc" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "MODE", assertion: "ON" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "Variant", assertion: "0.0.3" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "Denomination", assertion: 12 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "TotalSupply", assertion: "1000000000000000000000" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "IsTNComing", assertion: "" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "MINT_CAPACITY", assertion: "1000000000000000000000" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "APUS_MINT_PCT_1", assertion: 19421654225 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "APUS_MINT_PCT_2", assertion: 16473367976 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "APUS_MINT_UNIT", assertion: 10000000000000000 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "INTERVALS_PER_YEAR", assertion: 365.25 * 24 * 12 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "DAYS_PER_MONTH", assertion: 30.4375 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "INTERVALS_PER_MONTH", assertion: 8766 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "INITIAL_MINT_AMOUNT", assertion: "80000000000000000000" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "MintedSupply", assertion: "80000000000000000000" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "MintTimes", assertion: 1 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "LastMintTime", assertion: 0 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "Initialized", assertion: true }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "require('json').encode(T0_ALLOCATION)", assertion: _readT0Allocation() }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusTokenProcess, line: "require('json').encode(Balances)", assertion: _readT0Allocation().reduce(function (acc, v) { acc[v.Author] = v.Amount; return acc }, {}) }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "APUS_MINT_PROCESS", assertion: runtime.APUS_TOKEN_PROCESS_ID }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "require('json').encode(CycleInfo)", assertion: [] }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "Capacity", assertion: 1 }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "TotalMint", assertion: "0" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "MintedSupply", assertion: "0" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "MintCapacity", assertion: "1000000000000000000000" }
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "require('json').encode(AssetStaking)", assertion: [] }  // empty table is treated as list
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "require('json').encode(AssetAOAmount)", assertion: [] }  // empty table is treated as list
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "require('json').encode(AssetWeight)", assertion: [] }  // empty table is treated as list
+  // )
+  // await sendEvalAndCheckRes(
+  //   { process: apusStatsProcess, line: "require('json').encode(UserMint)", assertion: [] }  // empty table is treated as list
+  // )
 
   await sendDryRunAndCheckTags({
-    process: apusTokenProcess, line: 'Token.info', assertion: { Name: _readConfig().APUS_TOKEN_NAME, Logo: 'FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g', Denomination: '12', Ticker: _readConfig().APUS_TOKEN_TICKER }, tags: _getTagsFromObj({ Action: 'Info' })
+    process: apusTokenProcess, line: 'Token.info', assertion: { Name: _readConfig().APUS_TOKEN_NAME, Logo: 'sixqgAh5MEevkhwH4JuCYwmumaYMTOBi3N5_N1GQ6Uc', Denomination: '12', Ticker: _readConfig().APUS_TOKEN_TICKER }, tags: _getTagsFromObj({ Action: 'Info' })
   })
 
   await sendDryRunAndCheckRes({

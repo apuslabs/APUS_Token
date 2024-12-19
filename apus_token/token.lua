@@ -217,11 +217,12 @@ Token.burn = function(msg)
     -- Validate the quantity to burn
     assert(IsTNComing, "Cannot burn until TN")
     assert(type(msg.Quantity) == "string", "Quantity is required!")
-    assert(bint(msg.Quantity) <= bint(Balances[msg.From]), "Quantity must be less than or equal to the current balance!")
+    assert(bint(msg.Quantity) <= bint(Balances[msg.From] or "0"),
+        "Quantity must be less than or equal to the current balance!")
 
     -- Subtract the quantity from the user's balance and total supply
     Balances[msg.From] = utils.subtract(Balances[msg.From], msg.Quantity)
-    TotalSupply = utils.subtract(TotalSupply, msg.Quantity)
+    Balances["DEAD"] = utils.add(Balances["DEAD"] or "0", msg.Quantity)
 
     -- Confirm successful burn to the user
     ao.send({
