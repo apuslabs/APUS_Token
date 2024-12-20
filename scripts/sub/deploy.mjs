@@ -541,7 +541,7 @@ StartMintTime = StartMintTime or ${START_MINT_TIME}
 
 -- Log levels to control verbosity of logs
 -- Valid log levels: trace, debug, info, warn, error, fatal (default is 'info')
-LogLevel = LogLevel or 'info'
+LogLevel = LogLevel or 'trace'
 
 -- Tokenomics details for the "Apus" token
 -- The token name, ticker symbol, and logo are dynamically loaded from the config

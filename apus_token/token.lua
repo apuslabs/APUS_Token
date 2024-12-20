@@ -43,7 +43,6 @@ IsTNComing = IsTNComing or false
    ]]
 --
 Token.info = function(msg)
-    print("Return Info")
     Send({
         Target = msg.From,
         Name = Name,
