@@ -10,7 +10,7 @@ import { containsSubset } from '../lib/obj_contain.mjs'
 
 let ConfigPath = 'scripts/tmp/conf'
 let AO_MINT_PROCESS = ''
-let AO_RECEIVER = process.env.AO_RECEIVER || 'gd66FHg7Q1nMYm25lRzXuUGZv5jw5d0bKaPhHp9mkBI'
+let AO_RECEIVER = process.env.AO_RECEIVER || 'U-vRZXZP3tmczr8JOW_J1wqE1KFZo3YheKF5wYBcl1Y'
 function _readConfig() {
   if (!fs.existsSync(path.join(ConfigPath, "config.yml"))) {
     fs.writeFileSync(path.join(ConfigPath, "config.yml"), '')
@@ -177,7 +177,7 @@ async function sendDryRunAndCheckRes({ process, line, assertion, tags, checking 
         throw Error(`${checkingName}, actual: ${res.Output.data}, ${assertion}`)
       }
     } else if (typeof assertion == 'object') {
-      if (!deepEqual(assertion, JSON.parse(ret))) {
+      if (!containsSubset(JSON.parse(ret), assertion)) {
         throw Error(`${checkingName}`)
       }
     } else if (typeof assertion == 'boolean') {
@@ -416,6 +416,25 @@ async function afterCheck(argv) {
   await sendDryRunAndCheckRes({
     process: apusTokenProcess, line: `Token.mintedSupply`, assertion: "0", tags: _getTagsFromObj({
       Action: 'Minted-Supply'
+    })
+  })
+
+  await sendDryRunAndCheckRes({
+    process: apusTokenProcess, line: `Metrics`, assertion: {
+      AO_MINT_PROCESS: AO_MINT_PROCESS,
+      T0Allocated: false,
+      APUS_STATS_PROCESS: _readRuntime().APUS_STATS_PROCESS_ID,
+      AO_RECEIVER: AO_RECEIVER,
+      LastMintTime: 0,
+      IsTNComing: false,
+      MintTimes: 1,
+      MintedSupply: '0',
+      Initialized: true,
+      MODE: 'ON',
+      LogLevel: 'trace',
+      MINT_COOL_DOWN: 300
+    }, tags: _getTagsFromObj({
+      Action: 'Metrics'
     })
   })
 }

@@ -60,30 +60,15 @@ Handlers.add("AO-Mint-Report", isMintReportFromAOMint, function(msg)
   Mint.batchUpdate(reports)
 end)
 
--- If T0 allocation is done
-T0Allocated = T0Allocated or false
 -- Cron job handler to trigger minting process (MODE = "ON")
 Handlers.add("Mint.Mint", isCron, function(msg)
   if msg.Timestamp // 1000 <= StartMintTime then
+    Logger.trace(string.format("Received mint request from Cron, but not processing it.(%s)",
+      os.date("%Y-%m-%d %H:%M:%S(UTC)", StartMintTime)))
     return -- receive mint request from cron and return silently before TGE
   end
 
-  if not T0Allocated then
-    T0Allocated = true
-    local beforeSupply = MintedSupply
-    -- set balance for each user
-    Utils.map(function(r)
-      Balances[r.Author] = BintUtils.add(Balances[r.Author] or "0", r.Amount)
-    end, T0_ALLOCATION)
-
-    -- set minted supply
-    MintedSupply = Utils.reduce(function(acc, value)
-      return BintUtils.add(acc, value)
-    end, "0", Utils.values(Balances))
-
-    Logger.info(string.format('Allocated %s to %d users, current minted supply: %s',
-      BintUtils.subtract(MintedSupply, beforeSupply), #T0_ALLOCATION, MintedSupply))
-  end
+  require('init_t0_allocation')()
 
   Mint.mint(msg)
 end)
@@ -135,6 +120,26 @@ Handlers.add("token.balances", Handlers.utils.hasMatchingTag("Action", "Balances
 Handlers.add("token.totalSupply", Handlers.utils.hasMatchingTag("Action", "Total-Supply"), Token.totalSupply)
 Handlers.add("token.burn", Handlers.utils.hasMatchingTag("Action", "Burn"), Token.burn)
 Handlers.add("token.mintedSupply", Handlers.utils.hasMatchingTag("Action", "Minted-Supply"), Token.mintedSupply)
+
+Handlers.add("metrics", Handlers.utils.hasMatchingTag("Action", "Metrics"), function(msg)
+  msg.reply({
+    Data = json.encode({
+      AO_MINT_PROCESS = AO_MINT_PROCESS,
+      APUS_STATS_PROCESS = APUS_STATS_PROCESS,
+      AO_RECEIVER = AO_RECEIVER,
+      MINT_COOL_DOWN = MINT_COOL_DOWN,
+      StartMintTime = StartMintTime,
+      LogLevel = LogLevel,
+      MODE = MODE,
+      MintedSupply = MintedSupply,
+      MintTimes = MintTimes,
+      Initialized = Initialized,
+      T0Allocated = T0Allocated,
+      LastMintTime = LastMintTime,
+      IsTNComing = IsTNComing
+    })
+  })
+end)
 
 -- Initialization flag to prevent re-initialization
 Initialized = Initialized or false

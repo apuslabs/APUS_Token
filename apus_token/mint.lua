@@ -51,7 +51,7 @@ LastMintTime = LastMintTime or 0
 ]]
 Mint.batchUpdate = function(mintReportList)
     -- Iterate over each mint report and update the corresponding user's mint information
-    Logger.info('Receive mint reports, add mint value for ' .. #mintReportList .. ' user(s).')
+    Logger.info('Receive mint reports: ' .. #mintReportList .. ' user(s).')
     Utils.map(function(mintReport)
         Deposits:updateMintForUser(mintReport.User, mintReport.Mint)
     end, mintReportList)
