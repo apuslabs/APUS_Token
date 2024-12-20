@@ -10,7 +10,7 @@ import { containsSubset } from '../lib/obj_contain.mjs'
 
 let ConfigPath = 'scripts/tmp/conf'
 let AO_MINT_PROCESS = ''
-let AO_RECEIVER = process.env.AO_RECEIVER || 'gd66FHg7Q1nMYm25lRzXuUGZv5jw5d0bKaPhHp9mkBI'
+let AO_RECEIVER = process.env.AO_RECEIVER || 'U-vRZXZP3tmczr8JOW_J1wqE1KFZo3YheKF5wYBcl1Y'
 function _readConfig() {
   if (!fs.existsSync(path.join(ConfigPath, "config.yml"))) {
     fs.writeFileSync(path.join(ConfigPath, "config.yml"), '')

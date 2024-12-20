@@ -12,7 +12,7 @@ dotenv.config()
 
 let ConfigPath = 'scripts/tmp/conf'
 let AO_MINT_PROCESS = ''
-let AO_RECEIVER = process.env.AO_RECEIVER || 'gd66FHg7Q1nMYm25lRzXuUGZv5jw5d0bKaPhHp9mkBI'
+let AO_RECEIVER = process.env.AO_RECEIVER || 'U-vRZXZP3tmczr8JOW_J1wqE1KFZo3YheKF5wYBcl1Y'
 let START_MINT_TIME = 0
 
 function _exploreNodes(node, cwd) {
