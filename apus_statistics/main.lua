@@ -105,8 +105,9 @@ end
 local function updateUserMint(mintReports)
   local newUserMint = {}
   utils.map(function(mr)
-    -- Update the user's mint count
-    newUserMint[mr.User] = bintUtils.add(UserMint[mr.User] or "0", mr.Mint)
+    -- Normalize the user address to lower-case for compatibility
+    local userAddress = string.lower(mr.User)
+    newUserMint[userAddress] = bintUtils.add(UserMint[userAddress] or "0", mr.Mint)
   end, mintReports)
   UserMint = newUserMint
 end
@@ -213,7 +214,7 @@ end)
 -- Handler to estimate the user's APUS token based on the user's mint share
 Handlers.add("User.Get-User-Estimated-Apus-Token", "User.Get-User-Estimated-Apus-Token", function(msg)
   local status, err = pcall(function()
-    local targetUser = msg.User
+    local targetUser = string.lower(msg.User)  -- convert incoming address to lower-case
 
     assert(targetUser ~= nil, "Param target user not exists")
 

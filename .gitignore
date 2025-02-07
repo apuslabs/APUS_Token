@@ -46,3 +46,4 @@ node_modules
 .build
 
 .env
+scripts/tmp/conf/*
