@@ -1,5 +1,6 @@
 local Deposits = { _version = "0.0.1" }
 local BintUtils = require('utils.bint_utils')
+local Logger = require('utils.log')
 
 Deposits.__index = Deposits
 
@@ -23,6 +24,11 @@ end
 -- @param mint - The mint value to add to the user's record
 -- @description Updates the mint value for a specific user. If no record exists, a new one is created.
 function Deposits:updateMintForUser(user, mint)
+  assert(type(user) == "string", "User must be a string")
+  if user ~= string.lower(user) then
+    Logger.warn("Deposits:updateMintForUser: Warning: user address " .. user .. " is not lowercase, converting to lowercase.")
+    user = string.lower(user)
+  end
   local record = self.dbAdmin:select([[select * from Rewards where user = ?]], { user })
   if not record or #record <= 0 then
     record = {
@@ -41,6 +47,11 @@ end
 -- @returns The record for the specified user, or nil if no record exists
 -- @description Retrieves a specific user's record from the Rewards table.
 function Deposits:getByUser(user)
+  assert(type(user) == "string", "User must be a string")
+  if user ~= string.lower(user) then
+    Logger.warn("Deposits:getByUser: Warning: user address " .. user .. " is not lowercase, converting to lowercase.")
+    user = string.lower(user)
+  end
   local res = self.dbAdmin:select([[SELECT * FROM Rewards where User = ?]], { user })
   if not res or #res <= 0 then
     return nil
@@ -67,6 +78,10 @@ function Deposits:upsert(record)
   assert(type(record) == "table", "input must be table")
   assert(record.Recipient ~= nil, "Recipient is required")
   assert(record.User ~= nil, "User is required")
+  if type(record.User) == "string" and record.User ~= string.lower(record.User) then
+    Logger.warn("Deposits:upsert: Warning: record.User " .. record.User .. " is not lowercase, converting to lowercase.")
+    record.User = string.lower(record.User)
+  end
   assert(record.Mint ~= nil, "Mint is required")
 
   local results = self.dbAdmin:select([[
