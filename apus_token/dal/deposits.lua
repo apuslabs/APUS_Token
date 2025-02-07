@@ -109,12 +109,4 @@ function Deposits:clearMint()
   self.dbAdmin:apply("UPDATE Rewards set Mint = '0'", {});
 end
 
--- just for recovery
--- @description Clears all records from the Rewards table
-function Deposits:clearHistoryData()
-  -- clear all records from the Rewards table
-  self.dbAdmin:apply("DELETE FROM Rewards", {});
-  Logger.warn("Deposits:clearHistoryData: Cleared all records from the Rewards table. Begin To recover>>>>>>>")
-end
-
 return Deposits
