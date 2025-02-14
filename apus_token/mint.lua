@@ -53,7 +53,8 @@ Mint.batchUpdate = function(mintReportList)
     -- Iterate over each mint report and update the corresponding user's mint information
     Logger.info('Receive mint reports: ' .. #mintReportList .. ' user(s).')
     Utils.map(function(mintReport)
-        Deposits:updateMintForUser(mintReport.User, mintReport.Mint)
+        assert(mintReport.Yield, "Yield field is required")
+        Deposits:updateMintForUser(mintReport.User, mintReport.Yield)
     end, mintReportList)
     return "OK"
 end
