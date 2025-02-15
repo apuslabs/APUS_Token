@@ -2,11 +2,11 @@
 --   AO Addresses
 -- ]]
 -- Mint process address used for minting operations (dynamically set)
-AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
+AO_MINT_PROCESS = "1OEAToQGhSKV76oa1MFIGZ9bYxCJoxpXqtksApDdcu8"
 -- APUS stats process address used for tracking statistics (dynamically set from runtime config)
-APUS_STATS_PROCESS = "hEBzo6Up125OBeCKoz3W12y2CbQESl0Q4xoWkceDR00"
+APUS_STATS_PROCESS = "3l3Qqm8YM0bDAeYv1OW3vLMat3GqEp2ieq4xYFyDtcU"
 -- The receiver address for the AO process, typically refers to the AO instance ID (dynamically set)
-AO_RECEIVER = "wU4TFTVHL8vNuw8tNgab6bimvOh1S-V4I1xkYEQTDFQ"
+AO_RECEIVER = "U-vRZXZP3tmczr8JOW_J1wqE1KFZo3YheKF5wYBcl1Y"
 
 -- Minting cycle interval (in seconds)
 -- Defines the cooldown period between minting cycles, set to 300 seconds (5 minutes)

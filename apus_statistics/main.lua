@@ -104,11 +104,12 @@ end
 -- Function to update the user mint data based on the mint reports
 local function updateUserMint(mintReports)
   local newUserMint = {}
-  utils.map(function(mr)
-    -- Normalize the user address to lower-case for compatibility
-    local userAddress = string.lower(mr.User)
-    newUserMint[userAddress] = bintUtils.add(UserMint[userAddress] or "0", mr.Mint)
-  end, mintReports)
+  for _, mr in ipairs(mintReports) do
+      -- Normalize the user address to lower-case for compatibility
+      local userAddress = string.lower(mr.User)
+      -- Add to the user's total Mint
+      newUserMint[userAddress] = bintUtils.add(newUserMint[userAddress] or "0", mr.Mint)
+  end
   UserMint = newUserMint
 end
 
