@@ -39,12 +39,18 @@ function Deposits:updateMintForUser(user, mint)
         Recipient = user, -- Set Recipient same as User for Arweave addresses
       }
     else
-      Logger.warn("Creating new record with empty recipient for ETH address: " .. user)
-      record = {
-        User = user,
-        Mint = mint,
-        Recipient = "",
-      }
+      -- Check if it's an Ethereum address (42 chars starting with 0x)
+      if string.match(user, "^0x[0-9a-fA-F]+$") and string.len(user) == 42 then
+        Logger.warn("Creating new record with empty recipient for ETH address: " .. user)
+        record = {
+          User = user,
+          Mint = mint,
+          Recipient = "",
+        }
+      else
+        Logger.error("Invalid user address format: " .. user)
+        error("Dirty data: Invalid user address format") 
+      end
     end
   else
     record = record[1]
