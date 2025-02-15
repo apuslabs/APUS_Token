@@ -4,7 +4,7 @@ local Logger = require('utils.log')
 
 Deposits.__index = Deposits
 
--- 检查是否为有效的以太坊地址
+-- check if the address is a valid ethereum address
 local function isValidEthereumAddress(address)
   return string.match(address, "^0x[0-9a-fA-F]+$") and string.len(address) == 42
 end
