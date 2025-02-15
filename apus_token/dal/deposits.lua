@@ -4,6 +4,11 @@ local Logger = require('utils.log')
 
 Deposits.__index = Deposits
 
+-- 检查是否为有效的以太坊地址
+local function isValidEthereumAddress(address)
+  return string.match(address, "^0x[0-9a-fA-F]+$") and string.len(address) == 42
+end
+
 -- @param dbAdmin - dbAdmin instances from utils.db_admin
 -- @description Creates a new Deposits instance, initializes the Rewards table if not already present.
 function Deposits.new(dbAdmin)
@@ -25,7 +30,7 @@ end
 -- @description Updates the mint value for a specific user. If no record exists, a new one is created.
 function Deposits:updateMintForUser(user, mint)
   assert(type(user) == "string", "User must be a string")
-  if string.len(user) == 42 and user ~= string.lower(user) then
+  if isValidEthereumAddress(user) and user ~= string.lower(user) then
     Logger.warn("Deposits:updateMintForUser: Warning: user address " .. user .. " is not lowercase, converting to lowercase.")
     user = string.lower(user)
   end
@@ -39,8 +44,8 @@ function Deposits:updateMintForUser(user, mint)
         Recipient = user, -- Set Recipient same as User for Arweave addresses
       }
     else
-      -- Check if it's an Ethereum address (42 chars starting with 0x)
-      if string.match(user, "^0x[0-9a-fA-F]+$") and string.len(user) == 42 then
+      -- Check if it's an Ethereum address
+      if isValidEthereumAddress(user) then
         Logger.warn("Creating new record with empty recipient for ETH address: " .. user)
         record = {
           User = user,
@@ -64,7 +69,7 @@ end
 -- @description Retrieves a specific user's record from the Rewards table.
 function Deposits:getByUser(user)
   assert(type(user) == "string", "User must be a string")
-  if string.len(user) == 42 and user ~= string.lower(user) then
+  if isValidEthereumAddress(user) and user ~= string.lower(user) then
     Logger.warn("Deposits:getByUser: Warning: user address " .. user .. " is not lowercase, converting to lowercase.")
     user = string.lower(user)
   end
@@ -94,7 +99,8 @@ function Deposits:upsert(record)
   assert(type(record) == "table", "input must be table")
   assert(record.Recipient ~= nil, "Recipient is required")
   assert(record.User ~= nil, "User is required")
-  if type(record.User) == "string" and string.len(record.User) == 42 and record.User ~= string.lower(record.User) then
+  
+  if type(record.User) == "string" and isValidEthereumAddress(record.User) and record.User ~= string.lower(record.User) then
     Logger.warn("Deposits:upsert: Warning: record.User " .. record.User .. " is not lowercase, converting to lowercase.")
     record.User = string.lower(record.User)
   end

@@ -53,18 +53,10 @@ Mint.batchUpdate = function(mintReportList)
     -- Iterate over each mint report and update the corresponding user's mint information
     Logger.info('Receive mint reports: ' .. #mintReportList .. ' user(s).')
 
-    local filteredMintReportList = Utils.filter(function(mintReport)
-        if mintReport.Mint or mintReport.Mint == "" then
-            Logger.warn('Deprecated: mintReport.Mint value ' .. mintReport.Mint .. ' is used for user: ' .. mintReport.User .. ', please use mintReport.Yield instead')
-        end
-        return mintReport.Yield ~= nil
-    end, mintReportList)
-
-    Logger.info('filteredMint mint reports: ' .. #filteredMintReportList .. ' user(s).')
     Utils.map(function(mintReport)
         -- use yield as the mint amount to be compatible with API Update
         Deposits:updateMintForUser(mintReport.User, mintReport.Yield)
-    end, filteredMintReportList)
+    end, mintReportList)
     return "OK"
 end
 
