@@ -55,7 +55,7 @@ Mint.batchUpdate = function(mintReportList)
 
     Utils.map(function(mintReport)
         -- use yield as the mint amount to be compatible with API Update
-        Deposits:updateMintForUser(mintReport.User, mintReport.Mint)
+        Deposits:updateMintForUser(mintReport.User, mintReport.Yield)
     end, mintReportList)
     return "OK"
 end
