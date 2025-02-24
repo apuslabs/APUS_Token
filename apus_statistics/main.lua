@@ -88,7 +88,7 @@ end)
 -- Handler to estimate the user's APUS token based on the user's mint share
 Handlers.add("User.Get-User-Estimated-Apus-Token", "User.Get-User-Estimated-Apus-Token", function(msg)
   local status, err = pcall(function()
-    local targetUser = msg.User
+    local targetUser = string.lower(msg.User)
     assert(targetUser ~= nil, "Param target user not exists")
 
     local share = UserMint[targetUser] or "0"
