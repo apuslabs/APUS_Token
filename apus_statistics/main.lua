@@ -800,6 +800,7 @@ Handlers.add("User.Get-User-Estimated-Apus-Token", "User.Get-User-Estimated-Apus
 
     -- Get the ETH address for the given user address
     local userETH = getUserETHAddress(targetUser)
+    local ethShare = "0"
     if userETH then
       ethShare = UserMint[userETH] or "0"
     end
