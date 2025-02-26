@@ -801,12 +801,15 @@ Handlers.add("User.Get-User-Estimated-Apus-Token", "User.Get-User-Estimated-Apus
     -- Get the ETH address for the given user address
     local userETH = getUserETHAddress(targetUser)
     if userETH then
-      targetUser = userETH
+      ethShare = UserMint[userETH] or "0"
     end
 
     assert(targetUser ~= nil, "Param target user not exists")
 
     local share = UserMint[targetUser] or "0"
+
+    -- Add the ETH share to the total share for compatibility v1 eth user.
+    share = bintUtils.add(share, ethShare)
     local totalShare = TotalMint
 
     -- APUS_MINT_PCT_1 = 19421654225 APUS_MINT_PCT_2 = 16473367976
