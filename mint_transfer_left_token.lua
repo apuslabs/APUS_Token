@@ -5,16 +5,16 @@ local leftTokenRecipient = ao.id
 
 Balances[leftTokenRecipient] = BintUtils.subtract(MINT_CAPACITY,MintedSupply)
 
--- to be updated the address
+-- To be updated the address
 local fairRecipient = "eNen_uiF2CB96PzEymhV60oe3bdJP3ez-H9peEF99_A"
+
 IsTNComing = true
 Send({Target=ao.id,Action='Transfer',Recipient=fairRecipient,Quantity=Balances[leftTokenRecipient]})
             
 -- Update the total minted supply by summing all user balances
-MintedSupply = Utils.reduce(function(acc, v)
-    return BintUtils.add(acc, v)
-end, "0", Utils.values(Balances))
+MintedSupply = BintUtils.add(MintedSupply, Balances[leftTokenRecipient])
 
+assert(MintedSupply == MINT_CAPACITY, " Now MintedSupply must equal MINT_CAPACITY")
 print(string.format("MintedSupply: %s", MintedSupply))
 
 -- set mint process stop minting
