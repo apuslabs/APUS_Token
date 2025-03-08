@@ -91,28 +91,12 @@ end
         string: "OK" if minting is successful, or an error message if it fails.
 ]]
 
--- 1741737600（2025-03-12 UTC+0）1741651200（2025-03-11 UTC+0)
-StopMintTime = 1741737600
-
--- 0: not coming, 1: coming  boolean sometime have some problem:TBD
-IsStopMintTimeComing = IsStopMintTimeComing or 0
-
 Mint.mint = function(msg)
     -- Use pcall to safely execute the minting process and catch any runtime errors
     local status, err = pcall(function()
-        
-        if IsStopMintTimeComing == 1 then
-            Logger.info(string.format("Minting stopped at %s.", os.date("%Y-%m-%d %H:%M:%S(UTC)", StopMintTime)))
-            return
-        end
 
         -- Convert the timestamp from milliseconds to seconds
         local curTime = msg.Timestamp // 1000
-        if curTime > StopMintTime and IsStopMintTimeComing == 0 then
-            curTime = StopMintTime
-            IsStopMintTimeComing = 1
-            Logger.info(string.format("Last Minting. Minting at %s.", os.date("%Y-%m-%d %H:%M:%S(UTC)", StopMintTime)))
-        end
 
         -- If the action is triggered by Cron and the mode is OFF, do not proceed with minting
         if msg.Action == "Cron" and MODE ~= "ON" then
