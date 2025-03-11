@@ -90,9 +90,11 @@ end
     Returns:
         string: "OK" if minting is successful, or an error message if it fails.
 ]]
+
 Mint.mint = function(msg)
     -- Use pcall to safely execute the minting process and catch any runtime errors
     local status, err = pcall(function()
+
         -- Convert the timestamp from milliseconds to seconds
         local curTime = msg.Timestamp // 1000
 
