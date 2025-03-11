@@ -1,5 +1,5 @@
 local Utils = require('.utils')
-local BintUtils = require('apus_token.utils.bint_utils')
+local BintUtils = require('utils.bint_utils')
 
 local leftTokenRecipient = ao.id
 
