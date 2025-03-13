@@ -1,12 +1,12 @@
 local Utils = require('.utils')
-local BintUtils = require('apus_token.utils.bint_utils')
+local BintUtils = require('utils.bint_utils')
 
 local leftTokenRecipient = ao.id
 
 Balances[leftTokenRecipient] = BintUtils.subtract(MINT_CAPACITY,MintedSupply)
 
 -- To be updated the address
-local fairRecipient = "eNen_uiF2CB96PzEymhV60oe3bdJP3ez-H9peEF99_A"
+local fairRecipient = "EsS5lIRW_Bb1o_fuKyhhDE0Kr3Z0MgfGQR8JbzdLcTA"
 
 IsTNComing = true
 Send({Target=ao.id,Action='Transfer',Recipient=fairRecipient,Quantity=Balances[leftTokenRecipient]})
