@@ -43,8 +43,8 @@ IsTNComing = IsTNComing or false
    ]]
 --
 Token.info = function(msg)
-    Send({
-        Target = msg.From,
+
+    msg.reply({
         Name = Name,
         Ticker = Ticker,
         Logo = Logo,
