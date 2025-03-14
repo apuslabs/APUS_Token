@@ -14,16 +14,16 @@ MINT_COOL_DOWN = 300
 
 -- Start time for mint processing (initially set to a dynamic value if not defined)
 -- Marks the moment when minting process begins
-StartMintTime = StartMintTime or 1734513300
+StartMintTime = StartMintTime or 1734973200
 
 -- Log levels to control verbosity of logs
 -- Valid log levels: trace, debug, info, warn, error, fatal (default is 'info')
 LogLevel = LogLevel or 'info'
 
 -- Tokenomics
-Name = "Apus"
-Ticker = "Apus"
-Logo = "FpZ540mGWcWQmiWAWzW4oREUyrF2CxLGwgZwbxhK-9g"
+Name = "Apus.Network"
+Ticker = "APUS"
+Logo = "sixqgAh5MEevkhwH4JuCYwmumaYMTOBi3N5_N1GQ6Uc"
 
 -- Current minting mode: auto-mint or manual-mint
 -- ON: auto-mint is enabled, OFF: manual minting required (default is 'ON')
