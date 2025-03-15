@@ -78,8 +78,7 @@ Token.balance = function(msg)
     end
 
     -- Send the balance information back to the requester
-    ao.send({
-        Target = msg.From,
+    msg.reply({
         Balance = bal,
         Ticker = Ticker,
         Account = msg.Tags.Recipient or msg.From,
@@ -95,7 +94,7 @@ Token.balances = function(msg)
     if msg.reply then
         msg.reply({ Data = json.encode(Balances) })
     else
-        Send({ Target = msg.From, Data = json.encode(Balances) })
+        msg.reply({ Data = json.encode(Balances) })
     end
 end
 
@@ -167,8 +166,7 @@ Token.transfer = function(msg)
             end
         else
             -- Insufficient balance; send error message
-            ao.send({
-                Target = msg.From,
+            msg.reply({
                 Action = "Transfer-Error",
                 ["Message-Id"] = msg.Id,
                 Error = "Insufficient Balance!"
@@ -192,8 +190,7 @@ Token.totalSupply = function(msg)
     assert(msg.From ~= ao.id, "Cannot call Total-Supply from the same process!")
 
     -- Send the total supply information back to the requester
-    ao.send({
-        Target = msg.From,
+    msg.reply({
         Action = "Total-Supply",
         Data = TotalSupply,
         Ticker = Ticker
@@ -224,8 +221,7 @@ Token.burn = function(msg)
     Balances["DEAD"] = utils.add(Balances["DEAD"] or "0", msg.Quantity)
 
     -- Confirm successful burn to the user
-    ao.send({
-        Target = msg.From,
+    msg.reply({
         Data = Colors.gray .. "Successfully burned " .. Colors.blue .. msg.Quantity .. Colors.reset
     })
 end
