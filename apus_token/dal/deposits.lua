@@ -46,7 +46,7 @@ function Deposits:updateMintForUser(user, mint)
     else
       -- Check if it's an Ethereum address
       if isValidEthereumAddress(user) then
-        Logger.warn("Creating new record with empty recipient for ETH address: " .. user)
+        --Logger.warn("Creating new record with empty recipient for ETH address: " .. user)
         record = {
           User = user,
           Mint = mint,

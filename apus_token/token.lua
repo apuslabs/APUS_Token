@@ -92,11 +92,15 @@ end
    ]]
 --
 Token.balances = function(msg)
+<<<<<<< Updated upstream
     if msg.reply then
         msg.reply({ Data = json.encode(Balances) })
     else
         Send({ Target = msg.From, Data = json.encode(Balances) })
     end
+=======
+    msg.reply({ Data = json.encode(Balances) })
+>>>>>>> Stashed changes
 end
 
 --[[
