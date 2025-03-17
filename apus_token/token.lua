@@ -92,15 +92,7 @@ end
    ]]
 --
 Token.balances = function(msg)
-<<<<<<< Updated upstream
-    if msg.reply then
-        msg.reply({ Data = json.encode(Balances) })
-    else
-        Send({ Target = msg.From, Data = json.encode(Balances) })
-    end
-=======
     msg.reply({ Data = json.encode(Balances) })
->>>>>>> Stashed changes
 end
 
 --[[
@@ -166,8 +158,8 @@ Token.transfer = function(msg)
                 end
 
                 -- Send Debit-Notice and Credit-Notice
-                ao.send(debitNotice)
-                ao.send(creditNotice)
+                msg.reply(debitNotice)
+                Send(creditNotice)
             end
         else
             -- Insufficient balance; send error message
@@ -226,7 +218,7 @@ Token.burn = function(msg)
     -- Subtract the quantity from the user's balance and total supply
     Balances[msg.From] = utils.subtract(Balances[msg.From], msg.Quantity)
     Balances["DEAD"] = utils.add(Balances["DEAD"] or "0", msg.Quantity)
-
+    TotalSupply = utils.subtract(TotalSupply, msg.Quantity)
     -- Confirm successful burn to the user
     ao.send({
         Target = msg.From,
