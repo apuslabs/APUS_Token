@@ -102,13 +102,12 @@ Handlers.add("User.Balance", "User.Balance", function(msg)
   local record = Deposits:getByUser(user) or {}
   local recipient = record.Recipient
   local res = Balances[user] or "0"
-  if not recipient then
-    -- If no recipient, reply with the user's balance
-    msg.reply({ Data = res })
-    return
-  else
+  if recipient then
     -- If recipient exists, add balances and reply
     msg.reply({ Data = BintUtils.add(res, Balances[recipient] or "0") })
+  else
+    -- If no recipient, reply with the user's balance
+    msg.reply({ Data = res })
   end
 end)
 

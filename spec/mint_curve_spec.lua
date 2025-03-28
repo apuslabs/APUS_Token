@@ -9,11 +9,6 @@ TestMintCurve = {}
 Mint = nil
 
 function TestMintCurve:setup()
-  local sqlite3 = require('lsqlite3')
-  MintDb = sqlite3.open_memory()
-  DbAdmin = require('utils.db_admin').new(MintDb)
-  Deposits = require('dal.deposits').new(DbAdmin)
-
   -- local beforeCount = 0
   -- for key, value in pairs(_G) do
   --     beforeCount = beforeCount + 1
@@ -34,7 +29,6 @@ end
 
 function TestMintCurve:testFirstYear()
   local monthlyMinted = 0
-  local totalSupply = bint("100000000000000000000")
   local t0TotalSupply = "80000000000000000000"
   local apus_unit = bint("1000000000000")
 

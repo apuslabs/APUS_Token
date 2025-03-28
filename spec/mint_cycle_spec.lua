@@ -9,10 +9,6 @@ TestMintCycle = {}
 Mint = nil
 
 function TestMintCycle:setup()
-  local sqlite3 = require('lsqlite3')
-  MintDb = sqlite3.open_memory()
-  DbAdmin = require('utils.db_admin').new(MintDb)
-  Deposits = require('dal.deposits').new(DbAdmin)
   Mint = require('mint')
 end
 

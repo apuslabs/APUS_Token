@@ -91,11 +91,7 @@ end
    ]]
 --
 Token.balances = function(msg)
-    if msg.reply then
-        msg.reply({ Data = json.encode(Balances) })
-    else
-        msg.reply({ Data = json.encode(Balances) })
-    end
+  msg.reply({ Data = json.encode(Balances) })
 end
 
 --[[
@@ -219,7 +215,7 @@ Token.burn = function(msg)
     -- Subtract the quantity from the user's balance and total supply
     Balances[msg.From] = utils.subtract(Balances[msg.From], msg.Quantity)
     Balances["DEAD"] = utils.add(Balances["DEAD"] or "0", msg.Quantity)
-
+    TotalSupply = utils.subtract(TotalSupply, msg.Quantity)
     -- Confirm successful burn to the user
     msg.reply({
         Data = Colors.gray .. "Successfully burned " .. Colors.blue .. msg.Quantity .. Colors.reset
