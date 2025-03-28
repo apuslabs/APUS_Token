@@ -31,7 +31,6 @@ end
 function Deposits:updateMintForUser(user, mint)
   assert(type(user) == "string", "User must be a string")
   if isValidEthereumAddress(user) and user ~= string.lower(user) then
-    Logger.warn("Deposits:updateMintForUser: Warning: user address " .. user .. " is not lowercase, converting to lowercase.")
     user = string.lower(user)
   end
   local record = self.dbAdmin:select([[select * from Rewards where user = ?]], { user })
@@ -46,7 +45,6 @@ function Deposits:updateMintForUser(user, mint)
     else
       -- Check if it's an Ethereum address
       if isValidEthereumAddress(user) then
-        --Logger.warn("Creating new record with empty recipient for ETH address: " .. user)
         record = {
           User = user,
           Mint = mint,

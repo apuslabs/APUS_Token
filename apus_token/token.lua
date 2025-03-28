@@ -157,8 +157,8 @@ Token.transfer = function(msg)
                 end
 
                 -- Send Debit-Notice and Credit-Notice
-                msg.reply(debitNotice)
-                Send(creditNotice)
+                ao.send(debitNotice)
+                ao.send(creditNotice)
             end
         else
             -- Insufficient balance; send error message
