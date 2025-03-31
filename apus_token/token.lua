@@ -91,11 +91,7 @@ end
    ]]
 --
 Token.balances = function(msg)
-    if msg.reply then
-        msg.reply({ Data = json.encode(Balances) })
-    else
-        msg.reply({ Data = json.encode(Balances) })
-    end
+    msg.reply({ Data = json.encode(Balances) })
 end
 
 --[[
