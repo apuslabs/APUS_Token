@@ -120,6 +120,7 @@ Handlers.add("token.balances", Handlers.utils.hasMatchingTag("Action", "Balances
 Handlers.add("token.totalSupply", Handlers.utils.hasMatchingTag("Action", "Total-Supply"), Token.totalSupply)
 Handlers.add("token.burn", Handlers.utils.hasMatchingTag("Action", "Burn"), Token.burn)
 Handlers.add("token.mintedSupply", Handlers.utils.hasMatchingTag("Action", "Minted-Supply"), Token.mintedSupply)
+Handlers.add("token.batchTransfer", Handlers.utils.hasMatchingTag("Action", "Batch-Transfer"), Token.batchTransfer)
 
 Handlers.add("metrics", Handlers.utils.hasMatchingTag("Action", "Metrics"), function(msg)
   msg.reply({

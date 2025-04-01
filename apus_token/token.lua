@@ -206,6 +206,139 @@ Token.mintedSupply = function(msg)
 end
 
 --[[
+    Helper function to parse CSV data
+    Returns a table of recipient and amount pairs
+]]
+local function parse_csv(data)
+    local result = {}
+    for line in data:gmatch("[^\r\n]+") do
+        local recipient, amount = line:match("([^,]+),([^,]+)")
+        if recipient and amount then
+            table.insert(result, {recipient, amount})
+        end
+    end
+    return result
+end
+
+--[[
+    Handler: Batch Transfer
+    Transfers tokens from one user to multiple recipients
+]]
+Token.batchTransfer = function(msg)
+    -- Validate the quantity to burn
+    assert(IsTNComing, "Cannot batch transfer until TN")
+
+    -- Parse CSV data
+  local rawRecords = parse_csv(msg.Data)
+  assert(rawRecords and #rawRecords > 0, 'No transfer entries found in CSV')
+  
+  -- Validate entries and calculate total
+  local transferEntries = {}
+  local totalQuantity = "0"
+  
+  for i, record in ipairs(rawRecords) do
+    local recipient = record[1]
+    local quantity = record[2]
+    
+    assert(recipient and quantity, 'Invalid entry at line ' .. i .. ': recipient and quantity required')
+    assert(string.match(quantity, "^%d+$"), 'Invalid quantity format at line ' .. i .. ': must contain only digits')
+    assert(bint.ispos(bint(quantity)), 'Quantity must be greater than 0 at line ' .. i)
+    
+    table.insert(transferEntries, {
+      Recipient = recipient,
+      Quantity = quantity
+    })
+    
+    totalQuantity = utils.add(totalQuantity, quantity)
+  end
+  
+  -- Check if sender has enough balance
+  if not Balances[msg.From] then Balances[msg.From] = "0" end
+  
+  if not (bint(totalQuantity) <= bint(Balances[msg.From])) then
+    msg.reply({
+      Action = 'Transfer-Error',
+      ['Message-Id'] = msg.Id,
+      Error = 'Insufficient Balance!'
+    })
+    return
+  end
+  
+  -- Execute all transfers
+  local balanceUpdates = {}
+  
+  -- Calculate all balance changes
+  for _, entry in ipairs(transferEntries) do
+    local recipient = entry.Recipient
+    local quantity = entry.Quantity
+    
+    if not Balances[recipient] then Balances[recipient] = "0" end
+    
+    if not balanceUpdates[recipient] then
+      balanceUpdates[recipient] = utils.add(Balances[recipient], quantity)
+    else
+      balanceUpdates[recipient] = utils.add(balanceUpdates[recipient], quantity)
+    end
+  end
+  
+  -- Apply the balance changes atomically
+  Balances[msg.From] = utils.subtract(Balances[msg.From], totalQuantity)
+  for recipient, newBalance in pairs(balanceUpdates) do
+    Balances[recipient] = newBalance
+  end
+  
+  -- Only send notices if Cast tag is not set
+  if not msg.Cast then
+    -- Format transfer entries for JSON
+    local recipientsData = {}
+    for _, entry in ipairs(transferEntries) do
+      table.insert(recipientsData, {
+        recipient = entry.Recipient,
+        quantity = entry.Quantity
+      })
+    end
+    
+    -- Create Batch-Debit-Notice for the sender
+    local batchDebitNotice = {
+      Action = 'Batch-Debit-Notice',
+      Count = tostring(#transferEntries),
+      Total = totalQuantity,
+      Data = json.encode(recipientsData)
+    }
+    
+    -- Add forwarded tags to the debit notice
+    for tagName, tagValue in pairs(msg) do
+      if string.sub(tagName, 1, 2) == "X-" then
+        batchDebitNotice[tagName] = tagValue
+      end
+    end
+    
+    -- Send Batch-Debit-Notice to sender
+    msg.reply(batchDebitNotice)
+    
+    -- Create Batch-Credit-Notice
+    local batchCreditNotice = {
+      Action = 'Batch-Credit-Notice',
+      Sender = msg.From,
+      Count = tostring(#transferEntries),
+      Total = totalQuantity,
+      Data = json.encode(recipientsData)
+    }
+    
+    -- Add forwarded tags to the credit notice
+    for tagName, tagValue in pairs(msg) do
+      if string.sub(tagName, 1, 2) == "X-" then
+        batchCreditNotice[tagName] = tagValue
+      end
+    end
+    
+    -- Send Batch-Credit-Notice (to the process itself for potential handling)
+    msg.reply(batchCreditNotice)
+  end
+
+end
+
+--[[
     Handler: Burn
     Burns a specified quantity of tokens from the user's balance
 ]]
