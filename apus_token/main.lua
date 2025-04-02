@@ -9,8 +9,6 @@ local ao              = require('ao')
 -- Constants
 INITIAL_MINT_AMOUNT   = "80000000000000000000" -- 80,000,000 tokens with denomination
 
--- Import core modules
-Mint                  = require("mint")
 Token                 = require('token')
 Logger                = require('utils.log')
 
@@ -23,20 +21,12 @@ Handlers.add("token.balance", Handlers.utils.hasMatchingTag("Action", "Balance")
 Handlers.add("token.balances", Handlers.utils.hasMatchingTag("Action", "Balances"), Token.balances)
 Handlers.add("token.totalSupply", Handlers.utils.hasMatchingTag("Action", "Total-Supply"), Token.totalSupply)
 Handlers.add("token.burn", Handlers.utils.hasMatchingTag("Action", "Burn"), Token.burn)
-Handlers.add("token.mintedSupply", Handlers.utils.hasMatchingTag("Action", "Minted-Supply"), Token.mintedSupply)
 
 Handlers.add("metrics", Handlers.utils.hasMatchingTag("Action", "Metrics"), function(msg)
   msg.reply({
     Data = json.encode({
-      AO_MINT_PROCESS = AO_MINT_PROCESS,
-      APUS_STATS_PROCESS = APUS_STATS_PROCESS,
       AO_RECEIVER = AO_RECEIVER,
-      MINT_COOL_DOWN = MINT_COOL_DOWN,
-      StartMintTime = StartMintTime,
       LogLevel = LogLevel,
-      MODE = MODE,
-      MintedSupply = MintedSupply,
-      MintTimes = MintTimes,
       Initialized = Initialized,
       T0Allocated = T0Allocated,
       LastMintTime = LastMintTime,

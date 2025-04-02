@@ -194,14 +194,6 @@ Token.totalSupply = function(msg)
 end
 
 --[[
-    Handler: Minted Supply
-    Returns the minted supply of tokens
-]]
-Token.mintedSupply = function(msg)
-    msg.reply({ Data = MintedSupply })
-end
-
---[[
     Handler: Burn
     Burns a specified quantity of tokens from the user's balance
 ]]
