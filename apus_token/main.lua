@@ -28,8 +28,6 @@ Handlers.add("metrics", Handlers.utils.hasMatchingTag("Action", "Metrics"), func
       AO_RECEIVER = AO_RECEIVER,
       LogLevel = LogLevel,
       Initialized = Initialized,
-      T0Allocated = T0Allocated,
-      LastMintTime = LastMintTime,
       IsTNComing = IsTNComing
     })
   })
