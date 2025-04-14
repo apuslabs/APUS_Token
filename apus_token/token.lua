@@ -206,19 +206,24 @@ Token.mintedSupply = function(msg)
 end
 
 --[[
-    Helper function to parse CSV data
-    Returns a table of recipient and amount pairs
+    CSV Parser Implementation
+    ------------------------
+    Simple CSV parser that splits input by newlines and commas
+    to create a 2D table of values.
 ]]
-local function parse_csv(data)
+local function parseCSV(csvText)
     local result = {}
-    for line in data:gmatch("[^\r\n]+") do
-        local recipient, amount = line:match("([^,]+),([^,]+)")
-        if recipient and amount then
-            table.insert(result, {recipient, amount})
-        end
+    -- Split by newlines and process each line
+    for line in csvText:gmatch("[^\r\n]+") do
+      local row = {}
+      -- Split line by commas and add each value to the row
+      for value in line:gmatch("[^,]+") do
+        table.insert(row, value)
+      end
+      table.insert(result, row)
     end
     return result
-end
+  end
 
 --[[
     Handler: Batch Transfer
@@ -227,115 +232,113 @@ end
 Token.batchTransfer = function(msg)
     -- Validate the quantity to burn
     assert(IsTNComing, "Cannot batch transfer until TN")
+    -- Step 1: Parse CSV data and validate entries
+    local rawRecords = parseCSV(msg.Data)
+    assert(rawRecords and #rawRecords > 0, 'No transfer entries found in CSV')
 
-    -- Parse CSV data
-  local rawRecords = parse_csv(msg.Data)
-  assert(rawRecords and #rawRecords > 0, 'No transfer entries found in CSV')
-  
-  -- Validate entries and calculate total
-  local transferEntries = {}
-  local totalQuantity = "0"
-  
-  for i, record in ipairs(rawRecords) do
-    local recipient = record[1]
-    local quantity = record[2]
-    
-    assert(recipient and quantity, 'Invalid entry at line ' .. i .. ': recipient and quantity required')
-    assert(string.match(quantity, "^%d+$"), 'Invalid quantity format at line ' .. i .. ': must contain only digits')
-    assert(bint.ispos(bint(quantity)), 'Quantity must be greater than 0 at line ' .. i)
-    
-    table.insert(transferEntries, {
-      Recipient = recipient,
-      Quantity = quantity
-    })
-    
-    totalQuantity = utils.add(totalQuantity, quantity)
-  end
-  
-  -- Check if sender has enough balance
-  if not Balances[msg.From] then Balances[msg.From] = "0" end
-  
-  if not (bint(totalQuantity) <= bint(Balances[msg.From])) then
-    msg.reply({
-      Action = 'Transfer-Error',
-      ['Message-Id'] = msg.Id,
-      Error = 'Insufficient Balance!'
-    })
-    return
-  end
-  
-  -- Execute all transfers
-  local balanceUpdates = {}
-  
-  -- Calculate all balance changes
-  for _, entry in ipairs(transferEntries) do
-    local recipient = entry.Recipient
-    local quantity = entry.Quantity
-    
-    if not Balances[recipient] then Balances[recipient] = "0" end
-    
-    if not balanceUpdates[recipient] then
-      balanceUpdates[recipient] = utils.add(Balances[recipient], quantity)
-    else
-      balanceUpdates[recipient] = utils.add(balanceUpdates[recipient], quantity)
-    end
-  end
-  
-  -- Apply the balance changes atomically
-  Balances[msg.From] = utils.subtract(Balances[msg.From], totalQuantity)
-  for recipient, newBalance in pairs(balanceUpdates) do
-    Balances[recipient] = newBalance
-  end
-  
-  -- Only send notices if Cast tag is not set
-  if not msg.Cast then
-    -- Format transfer entries for JSON
-    local recipientsData = {}
-    for _, entry in ipairs(transferEntries) do
-      table.insert(recipientsData, {
-        recipient = entry.Recipient,
-        quantity = entry.Quantity
+    -- Collect valid transfer entries and calculate total
+    local transferEntries = {}
+    local totalQuantity = "0"
+
+    for i, record in ipairs(rawRecords) do
+      local recipient = record[1]
+      local quantity = record[2]
+
+      assert(recipient and quantity, 'Invalid entry at line ' .. i .. ': recipient and quantity required')
+      assert(string.match(quantity, "^%d+$"), 'Invalid quantity format at line ' .. i .. ': must contain only digits')
+      assert(bint.ispos(bint(quantity)), 'Quantity must be greater than 0 at line ' .. i)
+
+      table.insert(transferEntries, {
+        Recipient = recipient,
+        Quantity = quantity
       })
+
+      totalQuantity = utils.add(totalQuantity, quantity)
     end
-    
-    -- Create Batch-Debit-Notice for the sender
+
+    -- Step 2: Check if sender has enough balance
+    if not Balances[msg.From] then Balances[msg.From] = "0" end
+
+    if not (bint(totalQuantity) <= bint(Balances[msg.From])) then
+      msg.reply({
+        Action = 'Transfer-Error',
+        ['Message-Id'] = msg.Id,
+        Error = 'Insufficient Balance!'
+      })
+      return
+    end
+
+    -- Step 3: Prepare the balance updates
+    local balanceUpdates = {}
+
+    -- Calculate all balance changes
+    for _, entry in ipairs(transferEntries) do
+      local recipient = entry.Recipient
+      local quantity = entry.Quantity
+
+      if not Balances[recipient] then Balances[recipient] = "0" end
+
+      -- Aggregate multiple transfers to the same recipient
+      if not balanceUpdates[recipient] then
+        balanceUpdates[recipient] = utils.add(Balances[recipient], quantity)
+      else
+        balanceUpdates[recipient] = utils.add(balanceUpdates[recipient], quantity)
+      end
+    end
+
+    -- Step 4: Apply the balance changes atomically
+    Balances[msg.From] = utils.subtract(Balances[msg.From], totalQuantity)
+    for recipient, newBalance in pairs(balanceUpdates) do
+      Balances[recipient] = newBalance
+    end
+
+    -- Step 5: Always send a batch debit notice to the sender
     local batchDebitNotice = {
       Action = 'Batch-Debit-Notice',
       Count = tostring(#transferEntries),
       Total = totalQuantity,
-      Data = json.encode(recipientsData)
+      ['Batch-Transfer-Init-Id'] = msg.Id
     }
-    
-    -- Add forwarded tags to the debit notice
+
+    -- Forward any X- tags to the debit notice
     for tagName, tagValue in pairs(msg) do
       if string.sub(tagName, 1, 2) == "X-" then
         batchDebitNotice[tagName] = tagValue
       end
     end
-    
-    -- Send Batch-Debit-Notice to sender
+
+    -- Always send Batch-Debit-Notice to sender
     msg.reply(batchDebitNotice)
-    
-    -- Create Batch-Credit-Notice
-    local batchCreditNotice = {
-      Action = 'Batch-Credit-Notice',
-      Sender = msg.From,
-      Count = tostring(#transferEntries),
-      Total = totalQuantity,
-      Data = json.encode(recipientsData)
-    }
-    
-    -- Add forwarded tags to the credit notice
-    for tagName, tagValue in pairs(msg) do
-      if string.sub(tagName, 1, 2) == "X-" then
-        batchCreditNotice[tagName] = tagValue
+
+    -- Step 6: Send individual credit notices if Cast tag is not set
+    if not msg.Cast then
+      for _, entry in ipairs(transferEntries) do
+        local recipient = entry.Recipient
+        local quantity = entry.Quantity
+
+        -- Credit-Notice message template, sent to each recipient
+        local creditNotice = {
+          Target = recipient,
+          Action = 'Credit-Notice',
+          Sender = msg.From,
+          Quantity = quantity,
+          ['Batch-Transfer-Init-Id'] = msg.Id,
+          Data = Colors.gray ..
+              "You received " ..
+              Colors.blue .. quantity .. Colors.gray .. " from " .. Colors.green .. msg.From .. Colors.reset
+        }
+
+        -- Forward any X- tags to the credit notices
+        for tagName, tagValue in pairs(msg) do
+          if string.sub(tagName, 1, 2) == "X-" then
+            creditNotice[tagName] = tagValue
+          end
+        end
+
+        -- Send Credit-Notice to recipient
+        Send(creditNotice)
       end
     end
-    
-    -- Send Batch-Credit-Notice (to the process itself for potential handling)
-    msg.reply(batchCreditNotice)
-  end
-
 end
 
 --[[
