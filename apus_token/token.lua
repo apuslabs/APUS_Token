@@ -200,14 +200,6 @@ Token.totalSupply = function(msg)
 end
 
 --[[
-    Handler: Minted Supply
-    Returns the minted supply of tokens
-]]
-Token.mintedSupply = function(msg)
-    msg.reply({ Data = MintedSupply })
-end
-
---[[
     CSV Parser Implementation
     ------------------------
     Simple CSV parser that splits input by newlines and commas
