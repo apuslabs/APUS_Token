@@ -1,0 +1,7 @@
+Handlers.remove("AO-Mint-Report")
+Handlers.remove("Mint.Mint")
+Handlers.remove("Mint.Backup")
+Handlers.remove("User.Update-Recipient")
+Handlers.remove("User.Get-Recipient")
+Handlers.remove("User.Balance")
+collectgarbage("collect")

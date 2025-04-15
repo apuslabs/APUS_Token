@@ -25,6 +25,12 @@ local utils = {
 Variant = "0.0.3"
 -- token should be idempotent and not change previous state updates
 Denomination = Denomination or 12
+
+-- Token Info
+Name = "Apus.Network"
+Ticker = "APUS"
+Logo = "sixqgAh5MEevkhwH4JuCYwmumaYMTOBi3N5_N1GQ6Uc"
+
 -- Initial balance for the process
 Balances = Balances or {}
 -- Total supply of tokens: 1_000_000_000 Apus Tokens; 1_000_000_000_000_000_000 with denomination
@@ -91,11 +97,7 @@ end
    ]]
 --
 Token.balances = function(msg)
-    if msg.reply then
-        msg.reply({ Data = json.encode(Balances) })
-    else
-        msg.reply({ Data = json.encode(Balances) })
-    end
+    msg.reply({ Data = json.encode(Balances) })
 end
 
 --[[
@@ -195,14 +197,6 @@ Token.totalSupply = function(msg)
         Data = TotalSupply,
         Ticker = Ticker
     })
-end
-
---[[
-    Handler: Minted Supply
-    Returns the minted supply of tokens
-]]
-Token.mintedSupply = function(msg)
-    msg.reply({ Data = MintedSupply })
 end
 
 --[[
