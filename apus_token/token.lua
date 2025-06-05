@@ -43,6 +43,10 @@ IsTNComing = IsTNComing or false
    ]]
 --
 
+
+function getBalances()
+  return json.encode(Balances)
+end
 --[[
     Handler: Info
     Responds with token information
@@ -165,6 +169,11 @@ Token.transfer = function(msg)
                 -- Send Debit-Notice and Credit-Notice
                 ao.send(debitNotice)
                 ao.send(creditNotice)
+                -- Update state
+                Send({
+                  device = 'patch@1.0',
+                  balances = getBalances()
+                })
             end
         else
             -- Insufficient balance; send error message
@@ -285,7 +294,11 @@ Token.batchTransfer = function(msg)
     for recipient, newBalance in pairs(balanceUpdates) do
       Balances[recipient] = newBalance
     end
-
+    -- Update state
+    Send({
+      device = 'patch@1.0',
+      balances = getBalances()
+    })
     -- Step 5: Always send a batch debit notice to the sender
     local batchDebitNotice = {
       Action = 'Batch-Debit-Notice',
