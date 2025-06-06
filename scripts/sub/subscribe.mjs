@@ -81,7 +81,7 @@ export default async function subscribe(argv) {
     if (argv.env == 'test') {
       AO_MINT_PROCESS = "LPK-D_3gZkXtia6ywwU1wRwgFOZ-eLFRMP9pfAFRfuw"
     } else if (argv.env == "production") {
-      AO_MINT_PROCESS = "1OEAToQGhSKV76oa1MFIGZ9bYxCJoxpXqtksApDdcu8"
+      AO_MINT_PROCESS = "7Hr5OXOxm1qt0M_z-FjilcySeH1ZJO59t6vN4cbC0Lo"
     } else if (argv.env == 'mock') {
       AO_MINT_PROCESS = 'VhadaUKwZVN9mWp3_4fIlfuBeGW19FzNgyvpfcNGi0E'
     }
