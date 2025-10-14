@@ -39,15 +39,6 @@ TotalSupply = "1000000000000000000000"
 IsTNComing = IsTNComing or false
 
 --[[
-     Add handlers for each incoming Action defined by the ao Standard Token Specification
-   ]]
---
-
-
-function getBalances()
-  return json.encode(Balances)
-end
---[[
     Handler: Info
     Responds with token information
    ]]
@@ -172,7 +163,7 @@ Token.transfer = function(msg)
                 -- Update state
                 Send({
                   device = 'patch@1.0',
-                  balances = getBalances()
+                  balances = Balances
                 })
             end
         else
@@ -297,7 +288,7 @@ Token.batchTransfer = function(msg)
     -- Update state
     Send({
       device = 'patch@1.0',
-      balances = getBalances()
+      balances = Balances
     })
     -- Step 5: Always send a batch debit notice to the sender
     local batchDebitNotice = {
