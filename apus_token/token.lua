@@ -161,10 +161,13 @@ Token.transfer = function(msg)
                 ao.send(debitNotice)
                 ao.send(creditNotice)
                 -- Update state
-                Send({
-                  device = 'patch@1.0',
-                  balances = Balances
-                })
+                local patchMsg = {
+                  device = "patch@1.0",
+                  balances = {}
+                }
+                patchMsg.balances[msg.From] = Balances[msg.From]
+                patchMsg.balances[msg.Recipient] = Balances[msg.Recipient]
+                Send(patchMsg)
             end
         else
             -- Insufficient balance; send error message
@@ -285,11 +288,18 @@ Token.batchTransfer = function(msg)
     for recipient, newBalance in pairs(balanceUpdates) do
       Balances[recipient] = newBalance
     end
-    -- Update state
-    Send({
-      device = 'patch@1.0',
-      balances = Balances
-    })
+    
+    -- Update state and send patch message
+    local patchMsg = {
+      device = "patch@1.0",
+      balances = {}
+    }
+    patchMsg.balances[msg.From] = Balances[msg.From]
+    for recipient, newBalance in pairs(balanceUpdates) do
+      patchMsg.balances[recipient] = newBalance
+    end
+    Send(patchMsg)
+    
     -- Step 5: Always send a batch debit notice to the sender
     local batchDebitNotice = {
       Action = 'Batch-Debit-Notice',
